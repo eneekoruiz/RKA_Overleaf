@@ -1,0 +1,56 @@
+name: Overleaf Auto-Sync
+
+on:
+  schedule:
+    # Se ejecuta automáticamente cada 30 minutos
+    - cron: "*/30 * * * *"
+  workflow_dispatch: # Permite ejecutarlo manualmente con un clic desde GitHub
+
+permissions:
+  contents: write
+
+jobs:
+  sync-from-overleaf:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download & Extract from Overleaf
+        env:
+          OVERLEAF_PROJECT_ID: ${{ secrets.OVERLEAF_PROJECT_ID }}
+          OVERLEAF_COOKIE: ${{ secrets.OVERLEAF_COOKIE }}
+        run: |
+          if [ -z "$OVERLEAF_COOKIE" ]; then
+            echo "❌ Falta configurar el secreto OVERLEAF_COOKIE en GitHub."
+            exit 1
+          fi
+          PROJECT_ID="${OVERLEAF_PROJECT_ID:-6acd1f92fb154e211b0d0ba7}"
+          COOKIE_VAL="${OVERLEAF_COOKIE#overleaf_session2=}"
+
+          echo "📥 Descargando proyecto $PROJECT_ID desde Overleaf..."
+          curl -sSL "https://www.overleaf.com/project/${PROJECT_ID}/download/zip" \
+            -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)" \
+            -H "Cookie: overleaf_session2=${COOKIE_VAL}" \
+            -o /tmp/overleaf.zip
+
+          if ! unzip -t /tmp/overleaf.zip > /dev/null 2>&1; then
+            echo "❌ Error: No se pudo descargar el ZIP (la cookie overleaf_session2 puede ser inválida o haber caducado)."
+            exit 1
+          fi
+
+          echo "📦 Descomprimiendo archivos..."
+          unzip -o /tmp/overleaf.zip -d .
+
+      - name: Commit and Push Changes
+        run: |
+          git config user.name "Eneko Ruiz"
+          git config user.email "eneekoruiz@gmail.com"
+          git add .
+          if git diff --staged --quiet; then
+            echo "✅ El repositorio ya está actualizado con Overleaf."
+          else
+            git commit -m "chore: auto-sync from Overleaf"
+            git push
+            echo "🚀 Cambios subidos automáticamente a GitHub."
+          fi
