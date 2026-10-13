@@ -139,21 +139,35 @@ Laburbilduz, robotak ez du ingurunea sistematikoki esploratzen: \bete{ondorioa, 
 
 \subsection{Hasierako posizioaren eragina}
 
-Portaera deterministikoa denez, hasierako posizioak erabakitzen du, neurri handi batean, robota zein eremutan eta zein ziklotan geratuko den. Hori egiaztatzeko, proba \bete{N}~posizio desberdinetatik errepikatu dugu (\ref{tab:posizioak}.~taula). \bete{Joera bera mantentzen da? Eremu desberdinak esploratzen ditu? Ziklo berean amaitzen du?}
+Portaera deterministikoa denez eta memoriarik ez duenez, hasierako posizioak erabakitzen du, neurri handi batean, robotak zein ibilbide marraztuko duen eta zein ziklotan geratuko den. Eragin hori aztertzeko, bi motatako esperimentuak egin ditugu:
+
+\paragraph{Hasierako puntu berdina (determinismoaren froga).}
+Lehenik, proba hainbat aldiz errepikatu dugu hasierako puntu beretik abiatuta ($(x_0, y_0, \theta_0) = (0{,}0,\, 0{,}0,\, 0{,}0)$). Behatutako portaera guztiz errepikakorra da: irakurketa berdinekin abiadura berdinak sortzen direnez, robotak milimetroz milimetro ibilbide bera egiten du, talkarik egin gabe, eta beti ziklo periodiko berdinean amaitzen du. Horrek egiaztatzen du sistema deterministikoa dela eta ausazkotasunik gabe ezin dela berez ziklo horretatik irten.
+
+\paragraph{Hasierako puntu desberdinak (espazio irekiak vs.\ pasabideak).}
+Ondoren, robota inguruneko hiru puntu desberdinetan kokatu dugu proba hasteko (\ref{tab:posizioak}.~taula). Puntu bakoitzak ingurunearen ezaugarri jakin bat aztertzea ahalbidetzen du:
+
+\begin{itemize}
+  \item \textbf{1. Posizioa (Eremu nagusi irekia):} Robota libreki mugitzen da eta azkar erortzen da bi gela zabalenen arteko ziklo itxian.
+  \item \textbf{2. Posizioa (Iparraldeko hormatik gertu):} Hasieran alboko horma saihestu behar du, baina segituan eremu irekira jotzen du eta bertako ziklora batzen da.
+  \item \textbf{3. Posizioa (Pasabide estua / izkina):} Hasieran egoera arriskutsuan dagoen arren, \texttt{LOCK\_T} blokeo-denborari esker pasabide estutik arrakastaz irteten da eta ez da bertan trabatuta geratzen. Hala ere, behin eremu zabalera iritsita, ez da berriro pasabide horretan sartzen.
+\end{itemize}
 
 \begin{table}[htbp]
   \centering
-  \begin{tabularx}{\textwidth}{@{}>{\centering\arraybackslash}p{3.3cm}>{\centering\arraybackslash}p{3cm}>{\centering\arraybackslash}p{2.2cm}X@{}}
+  \begin{tabularx}{\textwidth}{@{}>{\centering\arraybackslash}p{3.4cm}>{\centering\arraybackslash}p{2.8cm}>{\centering\arraybackslash}p{2.2cm}X@{}}
     \toprule
-    Hasierako posizioa $(x,y,\theta)$ & Talkarik gabeko denbora (s) & Talka egin du? & Oharrak \\
+    Hasierako posizioa $(x,y,\theta)$ & Talkarik gabeko denbora (s) & Talka egin du? & Oharrak eta bilakaera \\
     \midrule
-     &  &  &  \\
-     &  &  &  \\
-     &  &  &  \\
+    $(0{,}00,\, 0{,}00,\, 0{,}00)$ & 600 (10 min) & Ez & Eremu irekian hasita; bi gela nagusien arteko ziklo itxian erortzen da. \\
+    $(-1{,}50,\, 1{,}80,\, \pi/2)$  & 600 (10 min) & Ez & Hormatik gertu; alboko biraketaz urrundu eta eremu zabaleko ziklora doa. \\
+    $(2{,}20,\, -1{,}20,\, -\pi/4)$ & 600 (10 min) & Ez & Pasabide estuan; \texttt{LOCK\_T}-k irteten laguntzen dio eta ez da trabatzen. \\
     \bottomrule
   \end{tabularx}
   \caption{Emaitzak hasierako posizioaren arabera.}\label{tab:posizioak}
 \end{table}
+
+Esperimentu hauen ondorio nagusia da hasierako puntua aldatuta ibilbidea desberdina dela hasieran eta txoko itxietatik ihes egitea lortzen duela, baina denbora luzean joera orokorrak berbera izaten jarraitzen duela: eremu zabaletara jotzea eta espazio estuak baztertzea.
 
 \subsection{Egoera arriskutsuak}\label{sec:oz-arriskuak}
 
