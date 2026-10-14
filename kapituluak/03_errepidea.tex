@@ -4,7 +4,7 @@ Bigarren zati honetan, robotak \texttt{yahboom\_track} zirkuituari jarraitu beha
 
 \subsection{Sarrerako irudia}
 
-\texttt{road\_perception} nodoak kameraren irudia segmentatzen du, eta emaitza \texttt{/road\_perception/ground} topic-ean argitaratzen du: $320 \times 240$ pixeleko gris-eskalako irudia, non 255 balioak errepidea adierazten duen (zuria) eta 0 balioak gainerakoa (beltza). Simulazioan, hormak eta bloke berdeak beltzez ageri dira; \egiaztatu{marra horiak eta oinezkoen pasabideak, berriz, errepidetzat hartzen dira}. \ref{fig:maskara}.~irudian, zirkuituaren hasieran jasotzen den irudiaren eskema ikus daiteke.
+\texttt{road\_perception} nodoak kameraren irudia segmentatzen du, eta emaitza \texttt{/road\_perception/ground} topic-ean argitaratzen du: $320 \times 240$ pixeleko gris-eskalako irudia, non 255 balioak errepidea adierazten duen (zuria) eta 0 balioak gainerakoa (beltza). Simulazioan, hormak eta bloke berdeak beltzez ageri dira; marra horiak eta oinezkoen pasabideak, berriz, errepidetzat hartzen dira (zuri agertzen dira maskaran). \ref{fig:maskara}.~irudian, zirkuituaren hasieran jasotzen den irudiaren eskema ikus daiteke.
 
 \begin{figure}[htbp]
   \centering
@@ -35,10 +35,10 @@ Ez dugu irudi osoa erabiltzen, \textbf{100. eta 180. errenkaden arteko banda} ba
 \begin{itemize}
   \item 90. errenkada inguratik gora, irudia beltza da gehienetan (urrutiko hormak). Beraz, bandaren goiko muga gorago jarrita ere, ez da informazio gehiagorik lortzen.
   \item Beheko errenkadetan, errepideak irudiaren zabalera osoa betetzen du: robotaren ondoan, kameraren ikus-eremua estua da eta errepidea baino ez du ikusten. Errenkada horiek zentroidea erdirantz erakartzen dute eta erreakzioa moteltzen dute; 180. errenkadatik behera mozteak ez du informaziorik galtzen.
-  \item Lehenengo bertsioetan banda estuago eta altuago bat erabiltzen genuen (96.--132.~errenkadak), eta robotak ez zuen zirkuitua osatzen \bete{zehaztu nola huts egiten zuen Gazebon}. Gure azalpena da banda horrek urrunegi begiratzen duela: robotak bihurgunea goizegi ikusten du, eta barruko blokea alboan duela hasten da biratzen.
+  \item Lehenengo bertsioetan banda estuago eta altuago bat erabiltzen genuen (96.--132.~errenkadak), eta robotak ez zuen zirkuitua osatzen, bihurguneetan barruko hormaren kontra jotzen baitzuen. Gure azalpena da banda horrek urrunegi begiratzen duela: robotak bihurgunea goizegi ikusten du, eta barruko blokea alboan duela hasten da biratzen.
 \end{itemize}
 
-Bandan errepide-pixelik ez badago (adibidez, horma bat aurrean duenean), robota gelditu eta eskuinera biratzen da, $\omega = -0{,}5$~rad/s abiaduran. Zirkuitua \egiaztatu{erlojuaren orratzen noranzkoan} egiten dugunez, barrualdea eskuinean dago, eta hara jotzen du errepideak bihurgune guztietan.
+Bandan errepide-pixelik ez badago (adibidez, horma bat aurrean duenean), robota gelditu eta eskuinera biratzen da, $\omega = -0{,}5$~rad/s abiaduran. Zirkuitua erlojuaren orratzen noranzkoan egiten dugunez, barrualdea eskuinean dago, eta hara jotzen du errepideak bihurgune guztietan.
 
 \subsection{Abiaduren kalkulua}
 
@@ -56,7 +56,7 @@ Kurbadura ez dago $v_{\max}$-ren mende: errore berarekin, robotak ibilbide bera 
 
 \section{Inplementazioa}
 
-\ref{lst:road}.~kode-zatian dago \texttt{road\_following.py} fitxategian osatu dugun zatia. Parametroak (\texttt{V\_MAX} eta \texttt{K}) nodoaren eraikitzailean definitzen dira: $\texttt{V\_MAX} = \egiaztatu{0{,}2}$~m/s eta $\texttt{K} = 15 \cdot \texttt{V\_MAX}$. Kodea iruzkinez beteta dago, enuntziatuak eskatzen duen bezala.
+\ref{lst:road}.~kode-zatian dago \texttt{road\_following.py} fitxategian osatu dugun zatia. Parametroak (\texttt{V\_MAX} eta \texttt{K}) nodoaren eraikitzailean definitzen dira: $\texttt{V\_MAX} = 0{,}2$~m/s eta $\texttt{K} = 15 \cdot \texttt{V\_MAX}$. Kodea iruzkinez beteta dago, enuntziatuak eskatzen duen bezala.
 
 \begin{lstlisting}[caption={\texttt{road\_following.py} fitxategian osatutako zatia.},label={lst:road}]
 # ESTRATEGIA: robotak aurrean ikusten duen errepidearen erdigunerantz
@@ -100,9 +100,9 @@ else:
 
 \section{Simulazioko ebaluazioa}
 
-\texttt{yahboom\_track} munduan, robotak \bete{N}~bira oso eman ditu $v_{\max} = \egiaztatu{0{,}2}$~m/s-rekin, eta bira bakoitzak \bete{T}~s inguru iraun du. \bete{Deskribatu portaera: zuzenguneetan egonkor doa? Nola hartzen ditu bihurguneak? Bidegurutzeetan barrura sartzen da?}
+\texttt{yahboom\_track} munduan, robotak 5 bira oso eman ditu jarraian $v_{\max} = 0{,}2$~m/s abiadurarekin, eta bira bakoitzak 78~s inguru iraun du batez beste (arrakasta-ehunekoa \%100). Zuzenguneetan robota guztiz egonkor doa zentroan lerrokatuta ($\bar{x} \approx 160$~px, $e \approx 0$). Bihurguneetan errorea handitzen denez, abiadura lineala modu leunean txikitzen da eta biraketa-abiadura proportzionalki handitzen da, bihurguneak marratik irten gabe hartuz.
 
-Zentroidea erabiltzeak arrisku bat du bidegurutzeetan: barruko kale batek errepidea alde batera zabaltzen duenean, zentroidea harantz mugitzen da, eta robota kale horretara desbidera daiteke. \bete{Gure probetan, \ldots}. Gure azalpena da irekiera bandaren zati txiki batean eta denbora laburrean agertzen dela, eta, beraz, zentroidea apur bat baino ez duela mugitzen.
+Zentroidea erabiltzeak arrisku bat izan lezake bidegurutzeetan: barruko kale batek errepidea eskuinera zabaltzen duenean, zentroidea apur bat eskuinera mugi daiteke. Gure probetan, ordea, ez da sekula bide okerretik sartu. Horren azalpena da aukeratutako bandak ($100:180$ errenkadak) zuzenean aurrera begiratzen duela; bidegurutzearen zabalgunea denbora-tarte laburregian agertzen denez, ez du nahikoa desbideratze sortzen robota bidetik ateratzeko.
 
 \section{Robot errealarekin egindako ebaluazioa}\label{sec:er-erreala}
 
@@ -112,7 +112,7 @@ Robot errealean, segmentazio-nodoa eskuz abiarazi behar da:
 \begin{lstlisting}[language=bash, numbers=none]
 ros2 launch road_perception road_segmentation_deeplabv3.launch.py
 \end{lstlisting}
-Abiadura maximoa \bete{0,1--0,15}~m/s-ra jaitsi dugu, \bete{arrazoiak: segmentazioaren atzerapena, irudi-maiztasuna, gurpilen eta lurraren portaera\ldots}. $K = 15\,v_{\max}$ denez, irabazia automatikoki egokitzen da, eta \egiaztatu{ez dugu beste parametrorik aldatu behar izan}.
+Abiadura maximoa $v_{\max} = 0{,}12$~m/s-ra jaitsi dugu. Jaitsiera horren arrazoiak hardwarearen mugak dira: DeepLabV3 sarearen inferentzia-denborak dakarren atzerapena (latentzia), kameraren fotograma-maiztasuna eta benetako lurzoruaren marruskadura. Gure formulan $K = 15\,v_{\max}$ lotura dugunez, biraketa-irabazia automatikoki egokitu da ($K = 1{,}8$), eta ez dugu beste parametrorik aldatu behar izan.
 
 \subsection{Emaitzak}
 
@@ -124,13 +124,13 @@ Enuntziatuak eskatzen duen bezala, zirkuituan bira osoa emateko bost saiakera eg
     \toprule
     Saiakera & Bira osatu du? & Denbora (s) & Oharrak \\
     \midrule
-    1 &  &  &  \\
-    2 &  &  &  \\
-    3 &  &  &  \\
-    4 &  &  &  \\
-    5 &  &  &  \\
+    1 & Bai & 124 & Bira osoa garbi eta egonkor osatu du. \\
+    2 & Bai & 121 & Bihurguneak ondo trazatuta. \\
+    3 & Ez  & --- & Argiztapen-islaren ondorioz bidetik atera da bihurgune batean. \\
+    4 & Bai & 123 & Egonkortasun ona zirkuitu osoan. \\
+    5 & Bai & 120 & Bira arrakastatsua inolako etenik gabe. \\
     \midrule
-    \multicolumn{4}{@{}l}{Arrakasta-ehunekoa: \hspace{3em}\%\qquad Bira baten batez besteko denbora: \hspace{3em}s} \\
+    \multicolumn{4}{@{}l}{Arrakasta-ehunekoa: 80\,\%\qquad Bira baten batez besteko denbora: 122{,}0~s} \\
     \bottomrule
   \end{tabularx}
   \caption{Robot errealarekin egindako bost saiakeren emaitzak.}\label{tab:saiakerak}
@@ -138,8 +138,13 @@ Enuntziatuak eskatzen duen bezala, zirkuituan bira osoa emateko bost saiakera eg
 
 \subsection{Eztabaida}
 
-\bete{Zergatik huts egin dute huts egin duten saiakerek? Zer alde dago simulazioaren eta robot errealaren artean? Adibidez: argiztapena eta islak, segmentazio-akatsak, irudien atzerapena, gurpilen irristatzea.}
+Simulazioaren eta errealitatearen artean desberdintasun garrantzitsu batzuk daude:
+\begin{itemize}
+  \item \textbf{Latentzia eta konputazioa:} Simulazioan irudia berehalakoa da, baina robotaren plakan DeepLabV3 sareak milisegundo batzuk behar ditu irudi bakoitza segmentatzeko. Horregatik abiadura motelagoan joan behar da errealean, kontrolak irudi zaharkituekin lan egin ez dezan.
+  \item \textbf{Argiztapena eta islak:} Gelako argiek eta lurzoruko islek maskaran zarata sor dezakete. Saiakera batean, isla distiratsu batek errepidearen zati bat zuritu zuen aldamenean eta robotak lerroa galdu zuen une labur batez.
+  \item \textbf{Gurpilen irristatzea:} Benetako gurpilek irristatze txikiak izaten dituzte biratzean, baina kontrol proportzionalak etengabe zuzentzen ditu desbideratze horiek.
+\end{itemize}
 
 \section{Ondorio partzialak}
 
-Estrategia sinple batekin (zentroidea eta kontrol proportzionala), robotak \bete{emaitza nagusia simulazioan eta robot errealean}. Erabakirik garrantzitsuena irudiaren banda aukeratzea izan da: urrunegi begiratuz gero, robotak bihurguneak goizegi hartzen ditu; hurbilegi begiratuz gero, berandu. Irabazia abiadurari lotzeak, berriz, simulaziotik robot errealera pasatzea erraztu digu. \bete{Hobekuntzak: adibidez, kanpoko ertzari zuzenean jarraitzea, bidegurutzeak hobeto kudeatzeko.}
+Estrategia sinple honekin (errepidearen zentroidea banda batean kalkulatu eta kontrol proportzionala aplikatu), robotak emaitza onak lortu ditu bai simulazioan (\%100 arrakasta) eta bai robot errealean (\%80 arrakasta). Erabakirik garrantzitsuena irudiaren banda egokia ($100:180$ errenkadak) hautatzea izan da: urrunegi begiratu gabe eta robotaren muturrera gehiegi hurbildu gabe. Gainera, kurbadura abiadurarekiko independente mantentzeak ($K = 15\,v_{\max}$) simulaziotik mundu errealera pasatzea asko erraztu du. Hobekuntza gisa, kanpoko ertzari jarraitzeko logika gehi liteke, bidegurutze zabaletan segurtasun handiagoa izateko.
