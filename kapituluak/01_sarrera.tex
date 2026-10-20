@@ -1,18 +1,3 @@
-\section{Praktikaren helburua}
+Praktika honen helburua robot mugikor baten sentsoreekin lan eginez bi portaera autonomo garatzea da. Lehenengoan, robotak ingurune batean nabigatu behar du oztoporik jo gabe, LiDARraren informazioa bakarrik erabiliz. Bigarrenean, errepide-zirkuitu bati jarraitu behar dio kanpoaldetik, aurreko kameraren irudian oinarrituta.
 
-Praktika honen helburua robot mugikor baten sentsoreekin lan egiten ikastea da, horietako bakoitzarekin portaera autonomo bat garatuz. Lehenengo zatian, robotak ingurune batean nabigatu behar du oztoporik jo gabe, LiDARraren informazioa bakarrik erabiliz. Bigarrenean, errepide-zirkuitu bati jarraitu behar dio kanpoaldetik, aurreko kameraren irudian oinarrituta.
-
-Bi portaerak ROS~2 \cite{ros2} erabiliz inplementatu ditugu, eta lehenik Gazebo simulagailuan \cite{gazebo} probatu ditugu. Errepide-jarraipena, gainera, robot errealean ere ebaluatu dugu.
-
-\section{Lan-ingurunea eta tresnak}
-
-Lan osoa ROSMASTER X3 robotarekin egin dugu. Praktika honetan bi sentsore erabili ditugu: RPLIDAR S2 LiDARra, robotaren inguruko 360 graduak neurtzen dituena, eta aurrealdeko Astra RGB-D kamera. Software aldetik, ROS~2 (Humble) eta Gazebo simulagailua erabili ditugu, irakasleak emandako hiru paketerekin batera:
-\begin{itemize}
-  \item \texttt{rwander}: oztopoak ekiditeko nodoaren egitura. Bertan osatu dugu \texttt{rwander.py} fitxategia.
-  \item \texttt{road\_perception}: kameraren irudia segmentatzen du, errepidea dena eta ez dena bereizteko. Simulazioan Gazeborekin batera abiarazten da; robot errealean, eskuz abiarazi behar da.
-  \item \texttt{road\_following}: errepideari jarraitzeko nodoaren egitura. Bertan osatu dugu \texttt{road\_following.py} fitxategia.
-\end{itemize}
-
-\section{Txostenaren egitura}
-
-\ref{ch:oztopoak}.~kapituluan oztopoak ekiditeko portaera aurkezten dugu: diseinatutako estrategia, inplementazioa eta simulazioan lortutako emaitzak, robotaren esplorazio-joeraren azterketa barne. \ref{ch:errepidea}.~kapituluan errepideari jarraitzeko portaera azaltzen dugu, simulazioan eta robot errealean ebaluatuta. Azkenik, \ref{ch:ondorioak}.~kapituluan praktikaren ondorio nagusiak jasotzen ditugu.
+Garatutako algoritmoak ROS~2 erabiliz inplementatu dira Gazebo simulagailuan, eta lan osoa ROSMASTER X3 robotarentzat diseinatu da, bere bi sentsore nagusiak erabiliz: RPLIDAR S2 LiDARra eta aurrealdeko RGB-D kamera. Errepide-jarraipena, gainera, robot errealean ere ebaluatu dugu.

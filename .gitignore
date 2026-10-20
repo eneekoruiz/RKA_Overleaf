@@ -3,6 +3,7 @@
 *.cookie
 cookies.txt
 *.zip
+*.docx
 
 # LaTeX build artifacts
 *.aux

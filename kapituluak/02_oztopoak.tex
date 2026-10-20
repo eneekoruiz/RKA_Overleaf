@@ -2,7 +2,7 @@ Lehen zati honetan, robotak Gazeboko \texttt{simple} munduan nabigatu behar du, 
 
 \section{Estrategia}\label{sec:oz-estrategia}
 
-Portaera erreaktibo bat diseinatu dugu: robotak ez du maparik eraikitzen, ezta ikusitakoa gogoratzen ere. LiDARraren irakurketa bakoitzarekin, une horretan ikusten duenaren arabera erabakitzen ditu abiadurak. Aukera hori sinpletasunagatik egin dugu, eta, \ref{sec:oz-ibilbidea}.~atalean ikusiko dugunez, robotaren esplorazio-joeraren zati handi bat ere horrek azaltzen du.
+Portaera erreaktibo bat diseinatu dugu: robotak ez du maparik eraikitzen, ezta ikusitakoa gogoratzen ere. LiDARraren irakurketa bakoitzarekin, une horretan ikusten duenaren arabera erabakitzen ditu abiadurak. Aukera hori sinpletasunagatik egin dugu, eta robotaren esplorazio-joera ere horrek azaltzen du.
 
 \subsection{LiDARraren datuen erabilera}
 
@@ -47,47 +47,20 @@ Hartutako estrategiak egoera bakoitzean hartzen dituen erabakiak \ref{tab:egoera
   \caption{Egoera bakoitzeko abiaduren erabakiak.}\label{tab:egoerak}
 \end{table}
 
-\section{Inplementazioa}
+\section{Inplementazioaren gakoak}
 
-\ref{lst:rwander}.~kode-zatian ageri da \texttt{rwander.py} fitxategian inplementatu dugun zati osoa:
+\texttt{rwander.py} nodoan garatutako logikaren lerro esanguratsuenak \ref{lst:rwander}.~zerrendan ageri dira: neurketen iragazketa eta txoko simetrikoetatik irteteko atzerako maniobra.
 
-\begin{lstlisting}[caption={\texttt{rwander.py} fitxategiko gure inplementazioa.},label={lst:rwander}]
-# --- 1. Parametroak eta neurketak ---
-atalasea = 0.2  # Zenbateko distantzia minimoa baimenduko dugu
-
-gradu30 = int(self._scan_count * (30 / 360))  # 30 graduko neurketa kopurua
-gradu90 = int(self._scan_count * (90 / 360))  # 90 graduko neurketa kopurua
-
-# Sektoreak lortu eta 5. txikiena hartu (zarata eta akatsak iragazteko)
+\begin{lstlisting}[caption={LiDAR sektoreen iragazketa eta atzerako maniobra.},label={lst:rwander}]
+# Sektoreak lortu eta 5. txikiena hartu (zarata iragazteko)
 f = sorted(self._scan[self._scan_mid - gradu30 : self._scan_mid + gradu30])[4]
 r = sorted(self._scan[self._scan_mid - gradu90 : self._scan_mid - gradu30])[4]
 l = sorted(self._scan[self._scan_mid + gradu30 : self._scan_mid + gradu90])[4]
-b1 = self._scan[0 : gradu30]
-b2 = self._scan[-gradu30 :]
-b = sorted(b1 + b2)[4]
+b = sorted(self._scan[0 : gradu30] + self._scan[-gradu30 :])[4]
 
-# --- 2. Abiaduren erabakia egoeraren arabera ---
-if f > atalasea:
-    self._avoiding = False
-    speed = 0.3
-    if r < atalasea:
-        turn = 0.3      # Eskuinean horma: ezkerrera leunki
-    elif l < atalasea:
-        turn = -0.3     # Ezkerrean horma: eskuinera leunki
-    else:
-        turn = 0.0      # Bide garbia: zuzen
-else:
-    speed = 0.0
-    if abs(l - r) > 0.1:
-        if l > r:
-            self._turn_dir = 1   # Ezkerrera biratu
-        else:
-            self._turn_dir = -1  # Eskuinera biratu
-    else:
-        # Txoko simetrikoa: atzean lekua badago, atzera egin ihesbide bila
-        if b > 0.1:
-            speed = -0.15
-    turn = 0.8 * self._turn_dir
+# Txoko simetrikoetan atzera eginez askatu
+if f <= atalasea and abs(l - r) <= 0.1 and b > 0.1:
+    speed = -0.15
 \end{lstlisting}
 
 \section{Ebaluazioa}\label{sec:oz-ebaluazioa}
@@ -104,33 +77,20 @@ Hasierako posiziotik abiatuta ($(0, 0, 0)$ puntuan), robotak 10 minutu osoak (60
 
 \irudihutsa{Robotaren ibilbidea 10 minutuko proban ($x$ ardatz horizontalean, $y$ bertikalean).}{fig:ibilbidea}{ibilbidearen grafikoa: $x$ horizontalean, $y$ bertikalean}
 
-Esplorazio-joera hori ez da kasualitatea; portaeraren diseinutik bertatik dator. Gure ustez, lau dira eragile nagusiak.
+Esplorazio-joera hori ez da kasualitatea; portaeraren diseinutik bertatik dator. Gure ustez, lau dira eragile nagusiak:
 
-\paragraph{Memoriarik gabeko portaera deterministikoa.} Robotak ez du gogoratzen non egon den: une bakoitzean ikusten duenari bakarrik erantzuten dio. Gainera, egoera bera aurkitzen duen bakoitzean, erabaki bera hartzen du. Ondorioz, ingurunearen geometriak ibilbide-ziklo batera eraman dezake robota, eta, behin ziklo horretan sartuta, ez dago handik ateratzen duen ezer. Horregatik zeharkatzen ditu eremu batzuk behin eta berriz, eta horregatik ez ditu beste batzuk inoiz bisitatzen.
-
-\paragraph{Leku zabaletarako joera.} Aurrean oztopo bat duenean, robotak leku gehien dagoen aldera biratzen du, eta alboetako hormetatik urruntzen da beti. Bi arau horiek eremu irekietara bultzatzen dute robota. Txoko itxiak eta pasabide estuak, aldiz, saihestu egiten ditu: haietara iristen denean, irteera zabalena aukeratzen du, eta oso gutxitan sartzen da barrura.
-
-\paragraph{Lerro zuzenak eta biraketa lekuan bertan.} Bidea libre dagoen bitartean, robotak lerro zuzenean egiten du aurrera, eta oztopo batera iristean gelditu eta biratu egiten da, aurrealdea libre geratu arte. Horregatik, ibilbidea segmentu zuzen luzez eta norabide-aldaketa bortitzez osatuta dago, billarreko bola batek mahaiaren ertzetan errebotatzean bezala. Errebote-angelua, ordea, ez da islapen hutsa: robotak aurrealdea $d_s$ gehi marjina libratu arte biratzen du, eta, beraz, hormarekiko angelu txikian, ia paraleloan, irteteko joera du.
-
-\paragraph{Biraketa-noranzkoaren alborapena.} Ezkerreko eta eskuineko distantzien arteko aldea $0{,}1$~m baino handiagoa denean, robotak leku gehiago dagoen aldera jotzen du. Aldea txikiagoa denean, aurreko biraketa-noranzkoari eusten dio eta atzera eginez askatzen da. Eremu irekietan oztopoen inguruan noranzko berean biratzeko joera duenez, ziklo itxietan erortzea errazten da.
+\begin{itemize}
+  \item \textbf{Memoriarik gabeko portaera erreaktiboa:} Robotak ez du gogoratzen non egon den: une bakoitzean ikusten duenari bakarrik erantzuten dio. Ondorioz, ingurunearen geometriak ibilbide-ziklo batera eraman dezake robota, eta ez dago handik ateratzen duen esplorazio-helbururik.
+  \item \textbf{Leku zabaletarako joera:} Aurrean oztopo bat duenean, robotak leku gehien dagoen aldera biratzen du, eta alboetako hormetatik urruntzen da beti. Bi arau horiek eremu irekietara bultzatzen dute robota eta txoko estuak saihesten dituzte.
+  \item \textbf{Lerro zuzenak eta lekuan bertako biraketak:} Bidea libre dagoen bitartean lerro zuzenean doa, eta oztopo batera iristean biratu egiten da aurrealdea libre geratu arte. Ondorioz, hormarekiko angelu txikian irteteko joera du.
+  \item \textbf{Biraketa-noranzkoaren alborapena:} Ezkerreko eta eskuineko distantzien arteko aldea $0{,}1$~m baino handiagoa denean leku librera jotzen du. Aldea txikiagoa denean, aurreko biraketa-noranzkoari eusten dio. Eremu irekietan oztopoen inguruan noranzko berean biratzeko joera duenez, ziklo itxietan erortzea errazten da.
+\end{itemize}
 
 Laburbilduz, robotak ez du ingurunea sistematikoki esploratzen: oztopoak modu seguruan saihesteko gai da, baina memoriarik eta maparik gabe, ibilbidea eremu irekietako ziklo periodikoetara mugatzen da.
 
 \subsection{Hasierako posizioaren eragina}
 
-Portaera deterministikoa denez eta memoriarik ez duenez, hasierako posizioak erabakitzen du, neurri handi batean, robotak zein ibilbide marraztuko duen eta zein ziklotan geratuko den. Eragin hori aztertzeko, bi motatako esperimentuak egin ditugu:
-
-\paragraph{Hasierako puntu berdina (determinismoaren froga).}
-Lehenik, proba hainbat aldiz errepikatu dugu hasierako puntu beretik abiatuta ($(x_0, y_0, \theta_0) = (0{,}0,\, 0{,}0,\, 0{,}0)$). Behatutako portaera guztiz errepikakorra da: irakurketa berdinekin abiadura berdinak sortzen direnez, robotak milimetroz milimetro ibilbide bera egiten du, talkarik egin gabe, eta beti ziklo periodiko berdinean amaitzen du. Horrek egiaztatzen du sistema deterministikoa dela eta ausazkotasunik gabe ezin dela berez ziklo horretatik irten.
-
-\paragraph{Hasierako puntu desberdinak (espazio irekiak vs.\ pasabideak).}
-Ondoren, robota inguruneko hiru puntu desberdinetan kokatu dugu proba hasteko (\ref{tab:posizioak}.~taula). Puntu bakoitzak ingurunearen ezaugarri jakin bat aztertzea ahalbidetzen du:
-
-\begin{itemize}
-  \item \textbf{1. Posizioa (Eremu nagusi irekia):} Robota libreki mugitzen da eta azkar erortzen da bi gela zabalenen arteko ziklo itxian.
-  \item \textbf{2. Posizioa (Iparraldeko hormatik gertu):} Hasieran alboko horma saihestu behar du, baina segituan eremu irekira jotzen du eta bertako ziklora batzen da.
-  \item \textbf{3. Posizioa (Pasabide estua / izkina):} Hasieran egoera arriskutsuan dagoen arren, atzerako maniobrari esker ($v = -0{,}15$~m/s, atzealdea libre badago) txokotik arrakastaz irteten da eta ez da bertan trabatuta geratzen. Hala ere, behin eremu zabalera iritsita, ez da berriro pasabide horretan sartzen.
-\end{itemize}
+Hasierako posizioak robotaren ibilbidean eta azken zikloan duen eragina aztertzeko, hiru puntu desberdinetan kokatu dugu robota proba hasteko (\ref{tab:posizioak}.~taula): eremu irekian, iparraldeko hormatik gertu eta pasabide/txoko estu batean.
 
 \begin{table}[htbp]
   \centering
@@ -146,7 +106,7 @@ Ondoren, robota inguruneko hiru puntu desberdinetan kokatu dugu proba hasteko (\
   \caption{Emaitzak hasierako posizioaren arabera.}\label{tab:posizioak}
 \end{table}
 
-Esperimentu hauen ondorio nagusia da hasierako puntua aldatuta ibilbidea desberdina dela hasieran eta txoko itxietatik ihes egitea lortzen duela, baina denbora luzean joera orokorrak berbera izaten jarraitzen duela: eremu zabaletara jotzea eta espazio estuak baztertzea.
+Esperimentu hauen ondorio nagusia da hasierako puntua aldatuta hasierako ibilbidea desberdina dela eta txoko itxietatik ihes egitea lortzen duela, baina denbora luzean joera orokorrak berbera izaten jarraitzen duela: eremu zabaletara jotzea eta espazio estuak baztertzea.
 
 \subsection{Egoera arriskutsuak}\label{sec:oz-arriskuak}
 
@@ -156,11 +116,6 @@ Proben emaitzetatik eta estrategiaren azterketatik, egoera hauek dira arriskutsu
   \item[Txoko itxiak eta U formako eremuak.] Aurrez aurreko txoko batera iristean, ezkerreko eta eskuineko distantziak oso antzekoak izaten dira ($|l - r| \le 0{,}1$~m). Lekuan bertan bakarrik biratuz gero, robota trabatuta gera liteke (\ref{fig:txokoa}.~irudia). Gure kodeak, ordea, egoera horretan atzealdea neurtzen du ($b > 0{,}1$~m); atzealdea libre badago, atzerako martxa ezartzen du ($v = -0{,}15$~m/s), eta horri esker txokotik askatzea eta biratzen jarraitzea lortzen du.
   \item[Hormara angelu txikian hurbiltzea.] Aurreko sektorea $\pm30^\circ$-koa denez, robota horma batera ia paraleloan hurbiltzen bada, horma alboko sektorean ikusten du, ez aurrekoan. Alboko biraketa leunak ($0{,}3$~rad/s) nahikoa denboran urruntzen ez badu, robotak alboa igurtz dezake.
   \item[Lekuan bertan biratzea oztopoetatik gertu.] Robota ez da zirkularra: lekuan bertan biratzean, izkinek zirkulu handiagoa marrazten dute. Horregatik atalasea $0{,}20$~m-tan finkatzea garrantzitsua da, biratzean ertzek hormarik jo ez dezaten.
-  \item[LiDARraren planotik kanpoko oztopoak.] LiDARrak plano horizontal bakarra neurtzen du. Plano horretatik behera dauden oztopo baxuak edo gainetik ateratzen direnak ez ditu ikusten. \texttt{simple} munduan ez da gertatzen, baina robot errealean kontuan hartu beharreko arriskua da.
 \end{description}
 
 \irudihutsa{Robota txoko batean harrapatuta, bere buruaren inguruan biraka.}{fig:txokoa}{Gazeboko pantaila-argazkia: robota txokoan}
-
-\section{Ondorio partzialak}
-
-Portaera erreaktibo sinple honekin, robotak 10 minutuz (600 segundo) jarraitu du etenik gabe eta talkarik jasan gabe \texttt{simple} munduan. Neurketen 5. balio txikiena hartzeak sentsorearen irakurketa okerrak iragazi ditu, eta atzerako mugimenduak txokoetan trabatzea ekidin du. Muga nagusia esplorazioa da: memoriarik ez duenez eta portaera deterministikoa denez, robotak ez du ingurune osoa estaltzen, eta eremu nagusi irekietako ziklo errepikakorretan geratzen da. Hobekuntza gisa, ausazkotasun txiki bat sar liteke biraketetan zikloak hausteko, edo bisitatutako eremuen mapa bat erabili esplorazioa bultzatzeko.

@@ -54,48 +54,20 @@ $K$ irabazia abiadura maximoarekiko proportzionala da: $K = 15\,v_{\max}$. Lehen
 \end{equation}
 Kurbadura ez dago $v_{\max}$-ren mende: errore berarekin, robotak ibilbide bera egiten du edozein abiaduratan. $K$ finko batekin, ordea, abiadura jaistean kurbadura handitu egingo litzateke, eta robotak gehiegi biratuko luke bihurguneetan. Horri esker, robot errealean abiadura jaistean ez dugu beste parametrorik doitu behar.
 
-\section{Inplementazioa}
+\section{Inplementazioaren gakoak}
 
-\ref{lst:road}.~kode-zatian dago \texttt{road\_following.py} fitxategian osatu dugun zatia. Parametroak (\texttt{V\_MAX} eta \texttt{K}) nodoaren eraikitzailean definitzen dira: $\texttt{V\_MAX} = 0{,}2$~m/s eta $\texttt{K} = 15 \cdot \texttt{V\_MAX}$. Kodea iruzkinez beteta dago, enuntziatuak eskatzen duen bezala.
+\texttt{road\_following.py} fitxategian inplementatutako logika nagusiaren zati esanguratsuena \ref{lst:road}.~zerrendan laburbiltzen da:
 
-\begin{lstlisting}[caption={\texttt{road\_following.py} fitxategian osatutako zatia.},label={lst:road}]
-# ESTRATEGIA: robotak aurrean ikusten duen errepidearen erdigunerantz
-# (zentroidera) biratzen du. Irudi segmentatuan 255 = errepidea (zuria)
-# eta 0 = ez-errepidea (beltza: hormak eta bloke berdeak).
-
-# 1. Irudiaren zati bat bakarrik erabili: 100-180 errenkadak.
-#    - Goiko errenkadak (100 baino gorago) urrunegi daude: bihurguneak
-#      goizegi ikusten dira eta robotak barruko blokearen kontra biratzen du.
-#    - Beheko errenkadak (180 baino beherago) errepidez beteta daude beti
-#      (zabalera osoan zuriak) eta ez dute informaziorik ematen.
+\begin{lstlisting}[caption={Banda horizontalaren zentroidea eta kontrol proportzionala.},label={lst:road}]
+# 100-180 errenkaden bandan errepidearen zentroidea kalkulatu
 zatia = cv_image[100:180, :]
+_, zutabeak = np.nonzero(zatia > 127)
+erdigunea = np.mean(zutabeak) if len(zutabeak) > 0 else image_width / 2
 
-# 2. Errepideko pixel guztien posizioak lortu (255 = errepidea).
-#    'zutabeak' pixel zuri bakoitzaren zutabea da (0 ezkerrean, 319 eskuinean).
-errenkadak, zutabeak = np.nonzero(zatia > 127)
-
-if len(zutabeak) == 0:
-    # 3a. Errepiderik ez da ikusten (adib. horma bat aurrean):
-    #     gelditu eta eskuinera biratu, zirkuituaren barrualdera.
-    linear_velocity = 0.0
-    angular_velocity = -0.5
-else:
-    # 3b. Errepidearen erdigunea: pixel zurien zutabeen batez bestekoa.
-    erdigunea = np.mean(zutabeak)
-
-    # 4. Errorea: erdigunea irudiaren erditik zenbat urruntzen den,
-    #    -1 (guztiz ezkerrean) eta 1 (guztiz eskuinean) artean.
-    #    error > 0 -> errepidea eskuinerantz doa (adib. eskuineko bihurgunea)
-    #    error < 0 -> errepidea ezkerrerantz doa
-    error = (erdigunea - image_width / 2) / (image_width / 2)
-
-    # 5. Kontrol proportzionala: errepidea dagoen aldera biratu.
-    #    ROS-en angular.z > 0 ezkerrera da eta < 0 eskuinera; horregatik minus zeinua.
-    angular_velocity = -self.K * error
-
-    # 6. Abiadura lineala: zenbat eta errore handiagoa (bihurgunea),
-    #    orduan eta motelago, biratzeko denbora izateko.
-    linear_velocity = self.V_MAX * (1 - abs(error))
+# Errore normalizatua eta kontrol proportzionala
+error = (erdigunea - image_width / 2) / (image_width / 2)
+angular_velocity = -self.K * error
+linear_velocity = self.V_MAX * (1 - abs(error))
 \end{lstlisting}
 
 \section{Simulazioko ebaluazioa}
@@ -112,7 +84,7 @@ Robot errealean, segmentazio-nodoa eskuz abiarazi behar da:
 \begin{lstlisting}[language=bash, numbers=none]
 ros2 launch road_perception road_segmentation_deeplabv3.launch.py
 \end{lstlisting}
-Abiadura maximoa $v_{\max} = 0{,}12$~m/s-ra jaitsi dugu. Jaitsiera horren arrazoiak hardwarearen mugak dira: DeepLabV3 sarearen inferentzia-denborak dakarren atzerapena (latentzia), kameraren fotograma-maiztasuna eta benetako lurzoruaren marruskadura. Gure formulan $K = 15\,v_{\max}$ lotura dugunez, biraketa-irabazia automatikoki egokitu da ($K = 1{,}8$), eta ez dugu beste parametrorik aldatu behar izan.
+Ingurune errealean abiadura maximoa $v_{\max} = 0{,}12$~m/s-ra jaitsi dugu. Jaitsiera horren arrazoiak hardwarearen mugak dira: DeepLabV3 sarearen inferentzia-denborak dakarren atzerapena (latentzia) eta kameraren fotograma-maiztasuna. Gure formulan $K = 15\,v_{\max}$ lotura dugunez, biraketa-irabazia automatikoki egokitu da ($K = 1{,}8$), eta ez dugu beste parametrorik aldatu behar izan.
 
 \subsection{Emaitzak}
 
@@ -138,13 +110,8 @@ Enuntziatuak eskatzen duen bezala, zirkuituan bira osoa emateko bost saiakera eg
 
 \subsection{Eztabaida}
 
-Simulazioaren eta errealitatearen artean desberdintasun garrantzitsu batzuk daude:
+Simulazioaren eta errealitatearen artean desberdintasun garrantzitsu hauek azpimarratu behar dira:
 \begin{itemize}
   \item \textbf{Latentzia eta konputazioa:} Simulazioan irudia berehalakoa da, baina robotaren plakan DeepLabV3 sareak milisegundo batzuk behar ditu irudi bakoitza segmentatzeko. Horregatik abiadura motelagoan joan behar da errealean, kontrolak irudi zaharkituekin lan egin ez dezan.
   \item \textbf{Argiztapena eta islak:} Gelako argiek eta lurzoruko islek maskaran zarata sor dezakete. Saiakera batean, isla distiratsu batek errepidearen zati bat zuritu zuen aldamenean eta robotak lerroa galdu zuen une labur batez.
-  \item \textbf{Gurpilen irristatzea:} Benetako gurpilek irristatze txikiak izaten dituzte biratzean, baina kontrol proportzionalak etengabe zuzentzen ditu desbideratze horiek.
 \end{itemize}
-
-\section{Ondorio partzialak}
-
-Estrategia sinple honekin (errepidearen zentroidea banda batean kalkulatu eta kontrol proportzionala aplikatu), robotak emaitza onak lortu ditu bai simulazioan (\%100 arrakasta) eta bai robot errealean (\%80 arrakasta). Erabakirik garrantzitsuena irudiaren banda egokia ($100:180$ errenkadak) hautatzea izan da: urrunegi begiratu gabe eta robotaren muturrera gehiegi hurbildu gabe. Gainera, kurbadura abiadurarekiko independente mantentzeak ($K = 15\,v_{\max}$) simulaziotik mundu errealera pasatzea asko erraztu du. Hobekuntza gisa, kanpoko ertzari jarraitzeko logika gehi liteke, bidegurutze zabaletan segurtasun handiagoa izateko.
