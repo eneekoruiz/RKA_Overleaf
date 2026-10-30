@@ -2,7 +2,7 @@
 
 Enuntziatuak LiDARraren informazioa oztopoak ekiditeko nola erabili dugun azaltzea eskatzen du. Gure helburua robotak oztopoak jo gabe eta modu leunean nabigatzea da. Horretarako portaera erreaktibo garbia erabiltzen dugu: ez dugu maparik eraikitzen eta ez dugu bisitatutako lekuen memoriarik gordetzen; uneko distantziei soilik erantzuten diegu.
 
-Norabide guztiak robotaren erreferentzia-sistemaren arabera definitzen dira: $0^\circ$ aurrera da; $+90^\circ$ ezkerrera; $-90^\circ$ eskuinera; eta $\pm180^\circ$ atzera. \texttt{rwander.py} nodoak neurketak berrantolatzen ditu, \texttt{\_scan\_mid} indizea aurrealdea izan dadin eta zerrendaren bi muturrak atzealdearen inguruan geratu daitezen. 360 izpien artean lau sektore nagusi bereizten ditugu:
+Norabide guztiak robotaren erreferentzia-sistemaren arabera definitzen dira: $0^\circ$ aurrera da; $+90^\circ$ ezkerrera; $-90^\circ$ eskuinera; eta $\pm180^\circ$ atzera. \texttt{rwander.py}\ nodoak neurketak berrantolatzen ditu, \texttt{\_scan\_mid}\ indizea aurrealdea izan dadin eta zerrendaren bi muturrak atzealdearen inguruan geratu daitezen. 360 izpien artean lau sektore nagusi bereizten ditugu:
 \begin{itemize}
   \item \textbf{Aurrea ($f$):} $-30^\circ$-tik $+30^\circ$-ra ($60^\circ$). Aurrerako bidea libre dagoen aztertzen du.
   \item \textbf{Eskuina ($r$):} $-90^\circ$-tik $-30^\circ$-ra ($60^\circ$). Eskuineko hormetatik urruntzeko eta biratzeko tartea alderatzeko balio du.
@@ -44,13 +44,17 @@ Abiadura lineala (\texttt{speed}, m/s) eta biraketa-abiadura (\texttt{turn}, rad
 \end{enumerate}
 
 \begin{lstlisting}[caption={LiDAR sektoreak, histeresia eta atzerako bultzada \texttt{rwander.py}-n.},label={lst:rwander}]
-# Sektoreak: 5. baliorik txikiena hartu zarata iragazteko
-f = sorted(self._scan[self._scan_mid - gradu30 : self._scan_mid + gradu30])[4]
-r = sorted(self._scan[self._scan_mid - gradu90 : self._scan_mid - gradu30])[4]
-l = sorted(self._scan[self._scan_mid + gradu30 : self._scan_mid + gradu90])[4]
-b = sorted(self._scan[0 : gradu30] + self._scan[-gradu30 :])[4]
+# Sektoreak: 5. txikiena zarata iragazteko
+f = sorted(self._scan[self._scan_mid - gradu30 :
+                      self._scan_mid + gradu30])[4]
+r = sorted(self._scan[self._scan_mid - gradu90 :
+                      self._scan_mid - gradu30])[4]
+l = sorted(self._scan[self._scan_mid + gradu30 :
+                      self._scan_mid + gradu90])[4]
+b = sorted(self._scan[0 : gradu30] +
+           self._scan[-gradu30 :])[4]
 
-# Histeresia: aurrean 2*atalasea libre izan arte ez da berriro abiatzen
+# Histeresia: aurrean 2*atalasea libre izan arte ez abiatu
 if f > atalasea and not (self._avoiding and f < 2 * atalasea):
     self._avoiding = False
     if r < atalasea:   turn = 0.3
@@ -82,42 +86,42 @@ Robot erreaktiboak ez daki aurretik non ibili den. Horregatik, U formako zokoeta
 
 \section{Proben emaitzak eta ikasitakoa}\label{sec:oz-emaitzak}
 
-Enuntziatuak talkarik gabe zenbat denbora iraun dezakeen eta ingurune osora mugitzen den aztertzea eskatzen du. Gazebon 10 minutuko hiru proba nagusi burutu ditugu (baita 5 eta 7 minutuko beste sei proba ere, eranskinean jasoak), \texttt{/gz\_pose} bidez benetako ibilbidea gordez.
+Enuntziatuak talkarik gabe zenbat denbora iraun dezakeen eta ingurune osora mugitzen den aztertzea eskatzen du. Gazebon 10 minutuko hiru proba nagusi burutu ditugu (baita 5 eta 7 minutuko beste sei proba ere, eranskinean jasoak), \texttt{/gz\_pose}\ bidez benetako ibilbidea gordez. Emaitza kuantitatiboak \ref{tab:rwander-10min}.~taulan eta ibilbideak \ref{fig:ibilbideak}.~irudian laburbiltzen dira.
 
 \begin{table}[htbp]
   \centering\small
-  \begin{tabularx}{\textwidth}{@{}lccccr@{}}
+  \begin{tabularx}{\textwidth}{@{}Xccccc@{}}
     \toprule
-    Hasierako posizioa $(x; y; \theta)$ & 1. kontaktua & 1. holgura $<0{,}5$~cm & Alertak $<1{,}5$~cm & Gorputz-kolpeak & Casi-choques \\
+    \textbf{Hasierako posizioa} $(x; y; \theta)$ & \textbf{1. kontaktua} & \textbf{1. holgura $<0{,}5$~cm} & \textbf{Alertak $<1{,}5$~cm} & \textbf{Kolpeak} & \textbf{Casi-choques} \\
     \midrule
     1. Ohikoa: $(2{,}00; -2{,}00; 90^\circ)$ & 151,4 s & 130,6 s & 50 & 1 & 104 \\
     2. Beheko ezkerra: $(-1{,}00; -2{,}10; 0^\circ)$ & 321,9 s & 93,0 s & 52 & 4 & 96 \\
     3. Barrutik: $(-1{,}60; 1{,}80; -90^\circ)$ & 495,6 s & 221,7 s & 50 & 1 & 92 \\
     \bottomrule
   \end{tabularx}
-  \caption{10 minutuko proben emaitza kuantitatiboak simple munduan.}\label{tab:rwander-10min}
+  \caption[10 minutuko proben emaitza kuantitatiboak]{10 minutuko proben emaitza kuantitatiboak \texttt{simple}\ munduan.}\label{tab:rwander-10min}
 \end{table}
 
 \begin{figure}[htbp]
   \centering
-  \begin{subfigure}[b]{0.32\textwidth}
+  \begin{subfigure}[b]{0.31\textwidth}
     \includegraphics[width=\textwidth]{trayectoria_pose1.png}
-    \caption{1. proba: Ohikoa $(2{,}00; -2{,}00)$.}
+    \caption{Ohikoa $(2{,}0; -2{,}0)$.}
     \label{fig:traj-p1}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.32\textwidth}
+  \begin{subfigure}[b]{0.31\textwidth}
     \includegraphics[width=\textwidth]{trayectoria_pose2.png}
-    \caption{2. proba: Behe-ezkerra $(-1{,}00; -2{,}10)$.}
+    \caption{Behe-ezkerra $(-1{,}0; -2{,}1)$.}
     \label{fig:traj-p2}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.32\textwidth}
+  \begin{subfigure}[b]{0.31\textwidth}
     \includegraphics[width=\textwidth]{trayectoria_pose3.png}
-    \caption{3. proba: Goiko ezkerra $(-1{,}60; 1{,}80)$.}
+    \caption{Goiko ezkerra $(-1{,}6; 1{,}8)$.}
     \label{fig:traj-p3}
   \end{subfigure}
-  \caption{Robotaren ibilbide errealak 10 minutuko hiru probetan. Gorriz ibilbidea; gurutze eta laukiek kontaktuak eta hurbiltze arriskutsuak adierazten dituzte.}\label{fig:ibilbideak}
+  \caption[Robotaren ibilbide errealak 10 minutuko probetan]{Robotaren ibilbide errealak 10 minutuko hiru probetan. Gorriz ibilbidea; gurutze eta laukiek kontaktuak eta hurbiltze arriskutsuak adierazten dituzte.}\label{fig:ibilbideak}
 \end{figure}
 
 \subsection{Emaitzen eztabaida}

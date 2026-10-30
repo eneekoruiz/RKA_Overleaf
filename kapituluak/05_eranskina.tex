@@ -1,12 +1,12 @@
-\section{Proba osagarriak Gazeboko \texttt{simple} munduan}
+\section{Proba osagarriak Gazeboko simple munduan}\label{sec:eranskina-probak}
 
 Testu nagusian hamar minutuko hiru probak aztertu dira. Hemen 5 eta 7 minutuko beste sei proba gehigarrien emaitzak laburbiltzen dira (\ref{tab:rwander-extra}.~taula), hasierako posizio desberdinen eragina osatzeko:
 
 \begin{table}[htbp]
   \centering\small
-  \begin{tabularx}{\textwidth}{@{}lcccc@{}}
+  \begin{tabularx}{\textwidth}{@{}X c c c@{}}
     \toprule
-    Iraupena eta hasiera & 1. alerta $< 0{,}5$~cm & Gorputz-kolpeak & Goiko ezkerreko eremua \\
+    \textbf{Iraupena eta hasiera} & \textbf{1. alerta $< 0{,}5$~cm} & \textbf{Kolpeak} & \textbf{Goiko ezkerreko eremua} \\
     \midrule
     10 min $\cdot$ ohikoa $(2{,}0; -2{,}0)$ & 130,6 s & 1 & Ez da sartzen (\%0) \\
     10 min $\cdot$ beheko ezkerra $(-1{,}0; -2{,}1)$ & 93,0 s & 4 & Sartzen da, 127,9 s (\%13) \\
@@ -21,15 +21,15 @@ Testu nagusian hamar minutuko hiru probak aztertu dira. Hemen 5 eta 7 minutuko b
     7 min $\cdot$ pasabidearen sarrera $(-2{,}2; -0{,}6)$ & 16,0 s & 2* & Ez da sartzen (eskuinera jotzen du) \\
     \bottomrule
   \end{tabularx}
-  \caption{Hasierako bederatzi posizioen ebaluazioa simple munduan. *~Kolpeetako bat 2,0~s-an erregistratu da, hormari itsatsita hasi zelako.}\label{tab:rwander-extra}
+  \caption[Hasierako bederatzi posizioen ebaluazioa]{Hasierako bederatzi posizioen ebaluazioa \texttt{simple}\ munduan. *~Kolpeetako bat 2,0~s-an erregistratu da, hormari itsatsita hasi zelako.}\label{tab:rwander-extra}
 \end{table}
 
 Emaitza hauek ondorio nagusia berresten dute: robotak badu ingurunean zehar mugitzeko gaitasuna, baina sarrera estua aurkitzea hasierako posizioaren eta ausazko erabakien araberakoa da. Erdian hasita 17~s-ra sartzen da; pasabide estuenaren ahoan hasita ($0{,}57$~m), ordea, alboko hormek kanpora bultzatzen dute eta ez da sartzen.
 
-\section{Erabilitako materialak eta biltegia}
+\section{Erabilitako materialak eta biltegia}\label{sec:eranskina-materialak}
 
-Praktikako kode guztiak, telemetria-fitxategiak eta erregistro gordinak honela antolatu dira:
+Praktikako gida ofizialean~\cite{lazkano2026} eskatutako kode guztiak, telemetria-fitxategiak eta erregistro gordinak honela antolatu dira:
 \begin{itemize}
-  \item \textbf{LiDAR ariketa (\texttt{rwander}):} \texttt{codigo/rwander.py} azaldutako bertsio nagusia da; \texttt{herramientas/gz\_metrics.py} kontaktuak eta holgura neurtzeko scripta da; \texttt{pruebas\_10min/}, \texttt{pruebas\_5min/} eta \texttt{pruebas\_7min/} karpetetan CSV fitxategiak eta ibilbideen grafikoak daude.
-  \item \textbf{Kamera ariketa (\texttt{road\_following}):} \texttt{road\_following\_final.py} azaldutako azken nodoa da; \texttt{datuak/} karpetan bost saiakeren nodo-logak (\texttt{.log}) eta JSON fitxategiak daude; \texttt{irudiak/} karpetan grafiko guztiak jaso dira.
+  \item \textbf{LiDAR ariketa (\texttt{rwander}):} \texttt{codigo/rwander.py}\ azaldutako bertsio nagusia da; \texttt{herramientas/gz\_metrics.py}\ kontaktuak eta holgura neurtzeko scripta da; \texttt{pruebas\_10min/}, \texttt{pruebas\_5min/}\ eta \texttt{pruebas\_7min/}\ karpetetan CSV fitxategiak eta ibilbideen grafikoak daude.
+  \item \textbf{Kamera ariketa (\texttt{road\_following}):} \texttt{road\_following\_final.py}\ azaldutako azken nodoa da; \texttt{datuak/}\ karpetan bost saiakeren nodo-logak (\texttt{.log}) eta JSON fitxategiak daude; \texttt{irudiak/}\ karpetan grafiko guztiak jaso dira.
 \end{itemize}
