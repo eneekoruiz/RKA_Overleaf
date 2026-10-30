@@ -1,117 +1,152 @@
-Bigarren zati honetan, robotak \texttt{yahboom\_track} zirkuituari jarraitu behar dio kanpoaldetik, aurreko kamera erabiliz. Enuntziatuak eskatzen duen bezala, irudiaren prozesamendurako eta abiadurak kontrolatzeko hartu ditugun erabakiak arrazoitzen ditugu, eta lortutako emaitzak eztabaidatzen.
+\section{Irudiaren eremuak eta pertzepzio-erabakiak}\label{sec:er-eremuak}
 
-\section{Estrategia}\label{sec:er-estrategia}
+Bigarren ariketan, robotak aurreko RGB-D kameraren bidez \texttt{yahboom\_track} zirkuituari jarraitu behar dio kanpoaldetik, erlojuaren orratzen noranzkoan. \texttt{road\_perception} nodoak (DeepLabV3 ereduan oinarritua) irudi segmentatua argitaratzen du \texttt{/road\_perception/ground} topic-ean: $320 \times 240$ pixeleko irudi bitarra da, non 255 balioak errepidea adierazten duen (zuria) eta 0 balioak gainerakoa (beltza).
 
-\subsection{Sarrerako irudia}
-
-\texttt{road\_perception} nodoak kameraren irudia segmentatzen du, eta emaitza \texttt{/road\_perception/ground} topic-ean argitaratzen du: $320 \times 240$ pixeleko gris-eskalako irudia, non 255 balioak errepidea adierazten duen (zuria) eta 0 balioak gainerakoa (beltza). Simulazioan, hormak eta bloke berdeak beltzez ageri dira; marra horiak eta oinezkoen pasabideak, berriz, errepidetzat hartzen dira (zuri agertzen dira maskaran). \ref{fig:maskara}.~irudian, zirkuituaren hasieran jasotzen den irudiaren eskema ikus daiteke.
+Kameraren iruditik bi azterketa-eremu nagusi definitu ditugu (\ref{fig:kamera-segmentazioa}.~irudia):
+\begin{itemize}
+  \item \textbf{Aurrerapen-banda nagusia (berdez):} 100 eta 180 errenkaden arteko tartea, zabalera osoan (\texttt{cv\_image[100:180, :]}).
+  \begin{itemize}
+    \item 100. errenkadatik gora hormak eta urruneko bidea daude; tarte hori sartuz gero bihurguneak goizegi detektatzen ziren.
+    \item 180. errenkadatik behera robotaren aurre-aurreko zorua dago, ia beti zuri osoa dena eta norabidearen inguruko informaziorik ematen ez duena.
+    \item Tarte honetan errepideko pixel zurien zutabeen \textbf{mediana} kalkulatzen dugu (\texttt{np.median(zutabeak)}), batezbestekoa baino sendoagoa delako zarata eta orban isolatuen aurrean.
+  \end{itemize}
+  \item \textbf{Gertuko eskuin-eremua (gorriz):} 180--240 errenkadak eta 160--320 zutabeak (\texttt{cv\_image[180:, 160:]}). Eremu honetan ez da mediana kalkulatzen: eremu ez-errepidearen (beltzaren) proportzioa neurtzen da. \%25 gainditzen badu, barruko uhartea gertuegi dagoela adierazten du.
+\end{itemize}
 
 \begin{figure}[htbp]
   \centering
-  \begin{tikzpicture}[x=0.028cm, y=-0.028cm]
-    \fill[black] (0,0) rectangle (320,240);
-    \fill[white] (0,134) -- (135,87) -- (190,87) -- (320,137) -- (320,240) -- (0,240) -- cycle;
-    \fill[blue, opacity=0.18] (0,100) rectangle (320,180);
-    \draw[blue!70!black, thick, dashed] (0,100) -- (320,100) (0,180) -- (320,180);
-    \draw[gray!60!black] (0,0) rectangle (320,240);
-    \draw[red!70!black, thick, densely dotted] (160,92) -- (160,188);
-    \node[red!70!black, font=\footnotesize, anchor=north] at (160,190) {$\bar{x} \approx W/2$};
-    \node[blue!70!black, font=\footnotesize, anchor=west] at (325,100) {100.\ errenkada};
-    \node[blue!70!black, font=\footnotesize, anchor=west] at (325,180) {180.\ errenkada};
-    \node[font=\footnotesize, anchor=south] at (160,-2) {$W = 320$ px};
-  \end{tikzpicture}
-  \caption{Irudi segmentatuaren eskema, zirkuituaren hasieran jasotako irudian oinarritua. Errepidea zuriz ageri da; urdinez, zentroidea kalkulatzeko erabiltzen den banda. Zuzengune batean, $\bar{x} \approx W/2$ eta $e \approx 0$.}
-  \label{fig:maskara}
+  \includegraphics[width=0.92\textwidth]{erreala_kamera_eta_segmentazioa.png}
+  \caption{Kameraren benetako irudiak (goian) eta DeepLabV3 segmentazioa (azpian) hiru unetan: zuzengunean, bihurgunean eta irteeran. Laukizuzen berdea aurrerapen-banda da (100--180 errenkadak) eta gorria eskuineko babes-eremua.}\label{fig:kamera-segmentazioa}
 \end{figure}
 
-\subsection{Irudiaren prozesamendua}
+\section{Abiaduren kontrola eta kasuen banaketa}\label{sec:er-abiadurak}
 
-Errepidearen norabidea jakiteko, errepide-pixelen \textbf{zentroidea} kalkulatzen dugu, hau da, pixel zurien zutabeen batez bestekoa, $\bar{x}$. Errepidea zuzen badoa, zentroidea irudiaren erdian geratzen da; eskuinerantz okertzen bada, eskuinera mugitzen da, eta alderantziz. Errorea zentroidea irudiaren erditik zenbat urruntzen den da, $-1$ eta $1$ artean normalizatuta:
-\begin{equation}
-  e = \frac{\bar{x} - W/2}{W/2}, \qquad W = 320.
-\end{equation}
+Zirkuitua erlojuaren noranzkoan denez, bihurgune guztiak eskuinera dira. Kontrol-legeak hiru kasu bereizten ditu:
 
-Ez dugu irudi osoa erabiltzen, \textbf{100. eta 180. errenkaden arteko banda} baizik. Erabaki hori robotak jasotzen duen irudiari begira hartu dugu:
-\begin{itemize}
-  \item 90. errenkada inguratik gora, irudia beltza da gehienetan (urrutiko hormak). Beraz, bandaren goiko muga gorago jarrita ere, ez da informazio gehiagorik lortzen.
-  \item Beheko errenkadetan, errepideak irudiaren zabalera osoa betetzen du: robotaren ondoan, kameraren ikus-eremua estua da eta errepidea baino ez du ikusten. Errenkada horiek zentroidea erdirantz erakartzen dute eta erreakzioa moteltzen dute; 180. errenkadatik behera mozteak ez du informaziorik galtzen.
-  \item Lehenengo bertsioetan banda estuago eta altuago bat erabiltzen genuen (96.--132.~errenkadak), eta robotak ez zuen zirkuitua osatzen, bihurguneetan barruko hormaren kontra jotzen baitzuen. Gure azalpena da banda horrek urrunegi begiratzen duela: robotak bihurgunea goizegi ikusten du, eta barruko blokea alboan duela hasten da biratzen.
-\end{itemize}
+\begin{enumerate}
+  \item \textbf{1. kasua: Errepiderik ez bandan ($n == 0$, biraketa itsua):}
+  Bihurgune itxi baten erdian robotak horma besterik ez du ikusten aurrean, eta bandan ez da pixel zuririk agertzen. Egoera honetan abiadura lineala $v = 0{,}20$~m/s-ra murrizten dugu eta eskuinera indartsu biratzen dugu: $\omega = -0{,}80$~rad/s. Zirkuituko bira guztiak eskuinera direnez, biraketa itsu honek errepidea berriro kameraren bistan sartzea bermatzen du.
+  
+  \item \textbf{2. kasua: Errepidea ikusten da (kontrol proportzionala offsetarekin):}
+  Errepide-pixelak daudenean ($n > 0$), errore normalizatua kalkulatzen dugu:
+  \begin{equation}
+    e = \frac{\text{erdigunea} - 200}{160}
+  \end{equation}
+  Erreferentzia ez dugu irudiaren erdi-erdian jarri (160), \textbf{200. zutabean} baizik (+40 pixeleko desplazamendua). Horri esker, robotak mediana eskuinerago mantentzen du eta bere ibilbidea errepidearen ezkerralderantz lerratzen du, hau da, \textbf{kanpoaldetik doa}, barruko uharte debekatutik urrun mantenduz.
+  
+  Biraketa-abiadura proportzionala kalkulatzen dugu:
+  \begin{equation}
+    \omega = \max(-1{,}5 \cdot e,\, -0{,}50)
+  \end{equation}
+  Irabazia $K = 1{,}5$ da. Eskuinerako biraketa $-0{,}50$~rad/s-ra mugatu dugu; muga hori gabe, bihurgunetik irtetean abiadura handian biratzen zuen eta barruko uharterantz joaten zen. Abiadura lineala errorearen arabera erregulatzen da:
+  \begin{equation}
+    v = 0{,}6 \cdot (1 - 0{,}7 \cdot |e|)
+  \end{equation}
+  Zuzenean $0{,}60$~m/s-ra iristen da, eta bihurguneetan moteldu egiten da (adibidez $|e| = 0{,}4$ denean $v \approx 0{,}43$~m/s).
+  
+  \item \textbf{3. kasua: Barruko uhartearen babesa:}
+  Bigarren kasuaren barruan, beheko eskuineko eremu gorriaren \%25 baino gehiago beltza bada, eskuinerako bira blokeatzen da: $\omega = \max(\omega, 0{,}0)$. Horrela, robotari ez zaio barruko marra horia zapaltzen uzten. Babes hau \textbf{2. kasuan soilik} aplikatzen da; 1. kasuan aplikatuko bagenu, hormaren aurrean biraketa blokeatu eta hormaren kontra zuzen joango litzateke.
+\end{enumerate}
 
-Bandan errepide-pixelik ez badago (adibidez, horma bat aurrean duenean), robota gelditu eta eskuinera biratzen da, $\omega = -0{,}5$~rad/s abiaduran. Zirkuitua erlojuaren orratzen noranzkoan egiten dugunez, barrualdea eskuinean dago, eta hara jotzen du errepideak bihurgune guztietan.
-
-\subsection{Abiaduren kalkulua}
-
-Biraketa-abiadura errorearekiko proportzionala da, eta abiadura lineala errorea handitu ahala txikitzen da:
-\begin{equation}
-  \omega = -K\,e, \qquad v = v_{\max}\,(1 - |e|).
-\end{equation}
-Minus zeinua ROSen hitzarmenagatik dago: $\omega > 0$ ezkerrera biratzea da; errepidea eskuinerantz badoa ($e > 0$), beraz, $\omega$ negatiboa izan behar da. Abiadura linealaren formulak robota moteltzen du bihurguneetan, biratzeko denbora izan dezan, eta zuzenguneetan abiadura maximoan joatea uzten dio. Txantiloiak, gainera, abiadurak mugatzen ditu: $v \le 0{,}3$~m/s eta $|\omega| \le 0{,}5$~rad/s.
-
-$K$ irabazia abiadura maximoarekiko proportzionala da: $K = 15\,v_{\max}$. Lehenengo $K = 2$ finkoa erabili genuen; robotak ondo hartzen zituen bihurguneak, baina beranduxe hasten zen biratzen. $K$ handituta, lehenago erreakzionatzen du. Irabazia abiadurari lotzeko arrazoia, berriz, geometrikoa da. Robotaren ibilbidearen kurbadura $\kappa = \omega / v$ da, eta $K = 15\,v_{\max}$ aukeratuta:
-\begin{equation}
-  \kappa = \frac{\omega}{v} = \frac{-15\,v_{\max}\,e}{v_{\max}\,(1-|e|)} = \frac{-15\,e}{1 - |e|}.
-\end{equation}
-Kurbadura ez dago $v_{\max}$-ren mende: errore berarekin, robotak ibilbide bera egiten du edozein abiaduratan. $K$ finko batekin, ordea, abiadura jaistean kurbadura handitu egingo litzateke, eta robotak gehiegi biratuko luke bihurguneetan. Horri esker, robot errealean abiadura jaistean ez dugu beste parametrorik doitu behar.
-
-\section{Inplementazioaren gakoak}
-
-\texttt{road\_following.py} fitxategian inplementatutako logika nagusiaren zati esanguratsuena \ref{lst:road}.~zerrendan laburbiltzen da:
-
-\begin{lstlisting}[caption={Banda horizontalaren zentroidea eta kontrol proportzionala.},label={lst:road}]
-# 100-180 errenkaden bandan errepidearen zentroidea kalkulatu
+\begin{lstlisting}[caption={Errepide-jarraipenaren logika nagusia \texttt{road\_following\_final.py}-n.},label={lst:road}]
+# 1. Aurrerapen-bandako pixel zuriak lortu
 zatia = cv_image[100:180, :]
-_, zutabeak = np.nonzero(zatia > 127)
-erdigunea = np.mean(zutabeak) if len(zutabeak) > 0 else image_width / 2
+errenkadak, zutabeak = np.nonzero(zatia == 255)
 
-# Errore normalizatua eta kontrol proportzionala
-error = (erdigunea - image_width / 2) / (image_width / 2)
-angular_velocity = -self.K * error
-linear_velocity = self.V_MAX * (1 - abs(error))
+if len(zutabeak) == 0:
+    # 2a. Biraketa itsua eskuinera hormaren aurrean
+    linear_velocity = 0.2
+    angular_velocity = -0.8
+else:
+    # 2b. Mediana eta kontrol proportzionala (+40 px offsetarekin)
+    erdigunea = np.median(zutabeak)
+    error = (erdigunea - (image_width / 2 + 40)) / (image_width / 2)
+    angular_velocity = max(-1.5 * error, -0.5)
+    linear_velocity = self.V_MAX * (1 - 0.7 * abs(error))
+    
+    # 2c. Babesa: barruko uhartea eskuinean gertuegi badago
+    if (cv_image[180:, image_width // 2:] < 128).mean() > 0.25:
+        angular_velocity = max(angular_velocity, 0.0)
+
+# Segurtasun-mugak ezarri
+twist_msg.linear.x = min(linear_velocity, 0.6)
+twist_msg.angular.z = np.clip(angular_velocity, -0.8, 0.8)
 \end{lstlisting}
 
-\section{Simulazioko ebaluazioa}
+\section{Simulazioko ebaluazioa eta maiztasun-arrakala}\label{sec:er-simulazioa}
 
-\texttt{yahboom\_track} munduan, robotak 5 bira oso eman ditu jarraian $v_{\max} = 0{,}2$~m/s abiadurarekin, eta bira bakoitzak 78~s inguru iraun du batez beste (arrakasta-ehunekoa \%100). Zuzenguneetan robota guztiz egonkor doa zentroan lerrokatuta ($\bar{x} \approx 160$~px, $e \approx 0$). Bihurguneetan errorea handitzen denez, abiadura lineala modu leunean txikitzen da eta biraketa-abiadura proportzionalki handitzen da, bihurguneak marratik irten gabe hartuz.
-
-Zentroidea erabiltzeak arrisku bat izan lezake bidegurutzeetan: barruko kale batek errepidea eskuinera zabaltzen duenean, zentroidea apur bat eskuinera mugi daiteke. Gure probetan, ordea, ez da sekula bide okerretik sartu. Horren azalpena da aukeratutako bandak ($100:180$ errenkadak) zuzenean aurrera begiratzen duela; bidegurutzearen zabalgunea denbora-tarte laburregian agertzen denez, ez du nahikoa desbideratze sortzen robota bidetik ateratzeko.
-
-\section{Robot errealarekin egindako ebaluazioa}\label{sec:er-erreala}
-
-\subsection{Abiaduren doikuntza}
-
-Robot errealean, segmentazio-nodoa eskuz abiarazi behar da:
-\begin{lstlisting}[language=bash, numbers=none]
-ros2 launch road_perception road_segmentation_deeplabv3.launch.py
-\end{lstlisting}
-Ingurune errealean abiadura maximoa $v_{\max} = 0{,}12$~m/s-ra jaitsi dugu. Jaitsiera horren arrazoiak hardwarearen mugak dira: DeepLabV3 sarearen inferentzia-denborak dakarren atzerapena (latentzia) eta kameraren fotograma-maiztasuna. Gure formulan $K = 15\,v_{\max}$ lotura dugunez, biraketa-irabazia automatikoki egokitu da ($K = 1{,}8$), eta ez dugu beste parametrorik aldatu behar izan.
-
-\subsection{Emaitzak}
-
-Enuntziatuak eskatzen duen bezala, zirkuituan bira osoa emateko bost saiakera egin ditugu (\ref{tab:saiakerak}.~taula). Arrakasta-ehunekoa osatutako biren proportzioa da, eta batez besteko denbora osatutako birekin bakarrik kalkulatu dugu.
+Gazeboko \texttt{yahboom\_track} zirkuituan bi konfigurazio probatu genituen (\ref{tab:sim-emaitzak}.~taula eta \ref{fig:sim-zirkuitua}.~irudia):
+\begin{itemize}
+  \item \textbf{S1 proba ($V_{\max} = 0{,}60$~m/s):} Lehen bihurgunea gainditu zuen, baina bigarrenean kanpoko hormari itsatsita geratu zen (7 kontaktu).
+  \item \textbf{S2 proba ($V_{\max} = 0{,}30$~m/s):} Zirkuituaren bira ia osoa osatu zuen $\approx 120$~s-tan (14 kontaktu arin hormarekin).
+\end{itemize}
 
 \begin{table}[htbp]
   \centering
-  \begin{tabularx}{\textwidth}{@{}>{\centering\arraybackslash}p{1.8cm}>{\centering\arraybackslash}p{3cm}>{\centering\arraybackslash}p{2.2cm}X@{}}
+  \begin{tabular}{lccl}
     \toprule
-    Saiakera & Bira osatu du? & Denbora (s) & Oharrak \\
+    Proba & $V_{\max}$ & Talka-kopurua & Behatutako emaitza \\
     \midrule
-    1 & Bai & 124 & Bira osoa garbi eta egonkor osatu du. \\
-    2 & Bai & 121 & Bihurguneak ondo trazatuta. \\
-    3 & Ez  & --- & Argiztapen-islaren ondorioz bidetik atera da bihurgune batean. \\
-    4 & Bai & 123 & Egonkortasun ona zirkuitu osoan. \\
-    5 & Bai & 120 & Bira arrakastatsua inolako etenik gabe. \\
-    \midrule
-    \multicolumn{4}{@{}l}{Arrakasta-ehunekoa: 80\,\%\qquad Bira baten batez besteko denbora: 122{,}0~s} \\
+    S1 & 0,60 m/s & 7 & 1. bihurgunea ondo; 2.ean kanpoko horman trabatuta \\
+    S2 & 0,30 m/s & 14 & Bira ia osoa 120 s-tan; amaieran hasieratik 0,4 m-ra \\
     \bottomrule
-  \end{tabularx}
-  \caption{Robot errealarekin egindako bost saiakeren emaitzak.}\label{tab:saiakerak}
+  \end{tabular}
+  \caption{Simulazioko proben laburpena \texttt{yahboom\_track} zirkuituan.}\label{tab:sim-emaitzak}
 \end{table}
 
-\subsection{Eztabaida}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.7\textwidth]{sim_zirkuitua_goitik.png}
+  \caption{Gazeboko \texttt{yahboom\_track} zirkuitua goitik ikusita. Kanpoko eraztun grisa jarraitu behar da; barruko gune berdeak eta marra horiak saihestu beharreko uharteak dira.}\label{fig:sim-zirkuitua}
+\end{figure}
 
-Simulazioaren eta errealitatearen artean desberdintasun garrantzitsu hauek azpimarratu behar dira:
+Simulazioan kontrol-begizta $\approx 9$~Hz-tan zebilen (robot errealean $30$~Hz-tan). $0{,}60$~m/s-ko abiaduran, robotak bi eguneratzeren artean $6{,}7$~cm egiten zituen aurrera; erreakzio-atzerapen horrek eragiten zuen hormaren kontra trabatzea.
+
+\section{Robot errealean egindako doikuntzak}\label{sec:er-doikuntzak}
+
+Robot errealean parametroak berrdoitu genituen:
 \begin{itemize}
-  \item \textbf{Latentzia eta konputazioa:} Simulazioan irudia berehalakoa da, baina robotaren plakan DeepLabV3 sareak milisegundo batzuk behar ditu irudi bakoitza segmentatzeko. Horregatik abiadura motelagoan joan behar da errealean, kontrolak irudi zaharkituekin lan egin ez dezan.
-  \item \textbf{Argiztapena eta islak:} Gelako argiek eta lurzoruko islek maskaran zarata sor dezakete. Saiakera batean, isla distiratsu batek errepidearen zati bat zuritu zuen aldamenean eta robotak lerroa galdu zuen une labur batez.
+  \item \textbf{Zigi-zaga murriztea:} Hasierako $K = \pi$ edo $K = 2{,}0$ balioekin biraketa denboraren \%58an zegoen saturatuta, ese handiak eginez. $K = 1{,}5$ balioarekin orientazio-aldaketak askoz leunagoak dira ($-30^\circ$ inguru).
+  \item \textbf{Atalase finkoen aldakortasuna:} Hasieran errepidea galtzeko $n < 4500$ atalasea erabili genuen. Baina saio berean, gelako argiztapena aldatu zenean, zuzeneko pixel kopurua 9091tik 2775era jaitsi zen. Horregatik atalase absolutuak kendu eta $n == 0$ baldintza soilik erabili genuen.
+\end{itemize}
+
+\ref{fig:abiadurak-telemetria}.~irudiak nodoaren telemetria erakusten du ebaluazioko 1. saiakeran: errepidea bistatik galtzen den uneetan ($n$ zerora jaistean), $v$ automatikoki $0{,}20$~m/s-ra jaisten da eta $\omega = -0{,}80$~rad/s biraketa itsua aplikatzen da.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.88\textwidth]{erreala_abiadurak_saiakera1.png}
+  \caption{Robot errealeko 1. saiakeraren telemetria denboran zehar: abiadura lineala ($v$), biraketa-abiadura ($\omega$) eta hautemandako errepide-pixel kopurua ($n$).}\label{fig:abiadurak-telemetria}
+\end{figure}
+
+\section{Bost saiakeren emaitzak eta kalkuluak}\label{sec:er-emaitzak}
+
+Enuntziatuak 5 saiakera jarraian egitea, arrakasta-ehunekoa kalkulatzea eta bira baten batez besteko denbora neurtzea eskatzen du. Saiakera guztiak bateria kargatuarekin ($11{,}3$--$11{,}4$~V) eta pista librean egin ditugu (\ref{tab:road-5saiakera}.~taula):
+
+\begin{table}[htbp]
+  \centering\small
+  \begin{tabularx}{\textwidth}{@{}lcccccr@{}}
+    \toprule
+    Saiakera & Bira-denbora & $v$ batez beste & $n=0$ gehienez & Barruko horia/berdea & Kanpoko marra & Emaitza \\
+    \midrule
+    1 & \textbf{20,31 s} & 0,452 m/s & 1,07 s & 0 / 0 frame & 30 / 273 & \textbf{Bai} \\
+    2 & \textbf{20,65 s} & 0,435 m/s & 1,23 s & 0 / 0 frame & 57 / 273 & \textbf{Bai} \\
+    3 & \textbf{20,65 s} & 0,438 m/s & 1,17 s & 0 / 0 frame & 58 / 275 & \textbf{Bai} \\
+    4 & \textbf{20,84 s} & 0,439 m/s & 1,13 s & 0 / 0 frame & 46 / 259 & \textbf{Bai} \\
+    5 & \textbf{21,66 s} & 0,427 m/s & 1,20 s & 0* / 0 frame & 51 / 242 & \textbf{Bai}* \\
+    \bottomrule
+  \end{tabularx}
+  \caption{Robot errealean egindako 5 saiakeren emaitzak. *~5. saiakeran detektagailu automatikoak marra hori 1 markatu zuen, baina eskuzko ikuskapenak frogatu zuen kanpoko hormaren oineko marra zela eta ez barruko uharte debekatua.}\label{tab:road-5saiakera}
+\end{table}
+
+\begin{itemize}
+  \item \textbf{Arrakasta-ehunekoa:} Bost birak modu arrakastatsuan osatu ziren barruko gune debekatuak (marra horia edo berdegunea) ukitu gabe:
+  \begin{equation}
+    \text{Arrakasta-tasa} = \frac{5}{5} \times 100 = \mathbf{100\,\%}
+  \end{equation}
+  \item \textbf{Batez besteko bira-denbora:}
+  \begin{equation}
+    \bar{t} = \frac{20{,}31 + 20{,}65 + 20{,}65 + 20{,}84 + 21{,}66}{5} = \mathbf{20{,}82 \pm 0{,}51\text{ s}}
+  \end{equation}
+  Denborarik azkarrena $20{,}31$~s izan zen eta geldoena $21{,}66$~s.
+  \item \textbf{Bateriaren tentsioaren eragin kritikoa:} Ebaluazioaren aurretik, bateria $10{,}3$~V-ra zegoenean (3S LiPo hustua), kode berberak behin eta berriz huts egin zuen: motorrek ez zuten biraketa-pare nahikorik ematen, biraketa itsuak $3{,}5$~s-raino luzatu ziren eta barruko marra zapaldu zuen. Bateria aldatu eta $11{,}4$~V jarrita, portaera \%100 fidagarria izan zen.
 \end{itemize}
