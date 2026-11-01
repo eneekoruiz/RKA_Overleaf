@@ -14,6 +14,12 @@ Ikasgai praktiko argiena bateriaren eragina izan zen: $10{,}3$~V-ko tentsioareki
 
 Kontrol-nodoaren log-ak agindutako abiadurak ($v$ eta $\omega$) erakusten ditu, baina robotak ez ditu beti balio horiek berehala betetzen. Gurpilen irristatzeak, hormaren kontrako igurztiek eta inertziak aginduaren eta mugimendu errealaren arteko aldea sortzen dute. Horregatik, simulazioko emaitzak (9~Hz-tan joan zirenak) eta robot errealekoak (30~Hz-tan) desberdinak izan dira, eta ingurune bakoitzean abiadurak bereizita probatu behar izan dira.
 
+\section{Robot fisikoen arteko desberdintasunak eta lehiaketako esperientzia}
+
+Gure kontrol-kodea eta parametroak sakonki egiaztatuta zeuden eta behar bezala funtzionatzen zuten, baina esklusiboki \textbf{RKA6} robot fisikoan. Hardwarearekiko menpekotasun zorrotz horretaz lehiaketaren egunean bertan jabetu ginen: probetarako emandako lehen 15 minutuetan, gure ordenagailua beste talde batek erabiltzen zuenez, beste ekipo batetik eta RKA6 robotarekin aritu ginen probatzen. Ondoren, \textbf{RKA9} robotarekin probatzean, kodeak ez zuen behar bezala funtzionatu robot horren beraren hardware-desberdintasunengatik (motorren erantzuna eta sentsoreen kalibrazioa desberdinak baitziren).
+
+Horren ondorioz, ezin izan genituen aurreikusitako probak behar bezala burutu; beste taldeak gure robota eta ordenagailua libre utzi arte itxaron behar izan genuen. Gure ekipamendua berreskuratu genuenerako, ordea, lehiaketa ofiziala hasita zegoen jada. Ez genuen astirik izan parametroak doitzeko ezta funtzionamendua berresteko ere, eta birak zuzenean baliozkotzat kontatzen hasi zitzaizkigun. Honek agerian uzten du itxuraz berdinak diren bi plataformaren (ROSMASTER X3) artean erantzun dinamiko desberdinak daudela, eta kontrol-parametroak ezin direla robot batetik bestera zuzenean transferitu aldez aurretiko kalibraziorik gabe.
+
 \section{Etorkizuneko hobekuntzak}
 
 Hurrengo urrats logikoa kameraren pertzepzioa hobetzea litzateke: irudiko pixel guztien mediana orokorra hartu beharrean, robotaren aurreko errepide-zati konektatua errenkadaz errenkada jarraitzea, alboetako adarrek kalkulua alferrik desbidera ez dezaten. LiDARrean, berriz, robotaren kaxa errektangularra kontuan hartuko lukeen segurtasun-eremu asimetrikoa ezartzea litzateke irtenbidea, alboetan eta atzealdean marjina handiagoa utziz.
