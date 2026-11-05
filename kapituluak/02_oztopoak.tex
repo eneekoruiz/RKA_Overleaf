@@ -1,6 +1,6 @@
 \section{LiDAR sektoreak eta diseinuaren arrazoiak}\label{sec:oz-sektoreak}
 
-Enuntziatuak LiDARraren informazioa oztopoak ekiditeko nola erabili dugun azaltzea eskatzen du. Gure helburua robotak oztopoak jo gabe eta modu leunean nabigatzea da. Horretarako portaera erreaktibo garbia erabiltzen dugu: ez dugu maparik eraikitzen eta ez dugu bisitatutako lekuen memoriarik gordetzen; uneko distantziei soilik erantzuten diegu.
+Enuntziatuak LiDARraren informazioa oztopoak ekiditeko nola erabili dugun azaltzea eskatzen du. Gure helburua robotak oztopoak jo gabe eta modu leunean nabigatzea da. Horretarako erabili dugun portaera honakoa izan da: ez dugu maparik eraikitzen eta ez dugu bisitatutako lekuen memoriarik gordetzen; uneko distantziei soilik erantzuten diegu.
 
 Norabide guztiak robotaren erreferentzia-sistemaren arabera definitzen dira: $0^\circ$ aurrera da; $+90^\circ$ ezkerrera; $-90^\circ$ eskuinera; eta $\pm180^\circ$ atzera. \texttt{rwander.py}\ nodoak neurketak berrantolatzen ditu, \texttt{\_scan\_mid}\ indizea aurrealdea izan dadin eta zerrendaren bi muturrak atzealdearen inguruan geratu daitezen. 360 izpien artean lau sektore nagusi bereizten ditugu:
 \begin{itemize}
@@ -74,32 +74,32 @@ else:
 
 \section{Esplorazioaren mugak eta gehitutako hobekuntzak}\label{sec:oz-esplorazioa}
 
-Robot erreaktiboak ez daki aurretik non ibili den. Horregatik, U formako zokoetan edo eremu irekietan bukleak errepikatzeko arriskua dago. Portaera aberasteko bi hobekuntza gehitu ditugu:
+Robot erreaktiboak ez daki aurretik non ibili den. Horregatik, U formako eremuetan bukleak errepikatzeko arriskua dago. Portaera aberasteko bi hobekuntza gehitu ditugu:
 \begin{itemize}
   \item \textbf{Noraez leuna (deriba):} Bidea libre dagoenean, aurreko biraketaren \%90 mantentzen dugu eta ausazko balio txiki bat gehitzen diogu:
   \begin{equation}
     \text{deriba} = 0{,}9 \cdot \text{deriba} + \mathcal{U}(-0{,}1,\, 0{,}1)
   \end{equation}
-  Honi esker mugimendua leuna da, ez du zigi-zaga zakarrik egiten eta ibilbidea etengabe aldatzen da.
-  \item \textbf{Alboko irekiguneetara biratzea ($90^\circ$-ko izpia):} Goiko ezkerreko eremu isolatura pasabide estu batzuen bidez ($0{,}57$~m eta $0{,}66$~m) bakarrik sartzen da. Aurretik pasata ere, robotak aurrera jarraitzeko joera zuen. Hori konpontzeko, alboko $90^\circ$-ko izpiak $1{,}50$~m baino gehiago neurtzen duenean eta alboko sektorea $0{,}90$~m baino txikiagoa denean (horma batean ate bat dagoenean), \%3ko probabilitatearekin $\text{deriba} = \pm1{,}2$~rad/s ezartzen da irekigunera burua sartzeko.
+  Honi esker mugimendua leuna da eta ibilbidea etengabe aldaketa txikiak jasaten ditu.
+  \item \textbf{Alboko irekiguneetara biratzea ($90^\circ$-ko izpia):} Pasabide estuen bidez bereizitako eremu isolatuetan sartzea errazteko, robotak alboko izpiekin irekigune bat detektatzen duenean ($90^\circ$-ko izpiak $> 1{,}50$~m eta alboko sektoreak $< 3 \times \text{atalasea}$), \%3ko probabilitatearekin $\text{deriba} = \pm1{,}2$~rad/s ezartzen da irekigunera bideratzeko eta ingurunea hobeto esploratzeko.
 \end{itemize}
 
 \section{Proben emaitzak eta ikasitakoa}\label{sec:oz-emaitzak}
 
-Enuntziatuak talkarik gabe zenbat denbora iraun dezakeen eta ingurune osora mugitzen den aztertzea eskatzen du. Gazebon 10 minutuko hiru proba nagusi burutu ditugu (baita 5 eta 7 minutuko beste sei proba ere, eranskinean jasoak), \texttt{/gz\_pose}\ bidez benetako ibilbidea gordez. Emaitza kuantitatiboak \ref{tab:rwander-10min}.~taulan eta ibilbideak \ref{fig:ibilbideak}.~irudian laburbiltzen dira.
+Enuntziatuak talkarik gabe zenbat denbora iraun dezakeen eta ingurune osora mugitzen den aztertzea eskatzen du. Gazebon 5 minutuko hiru proba berri burutu ditugu (304~s bakoitza, \texttt{atalasea} $= 0{,}25$~m-rekin), \texttt{/gz\_pose}\ bidez benetako ibilbidea gordez. Emaitza kuantitatiboak \ref{tab:rwander-5min}.~taulan eta ibilbideak \ref{fig:ibilbideak}.~irudian laburbiltzen dira.
 
 \begin{table}[htbp]
   \centering\small
   \begin{tabularx}{\textwidth}{@{}Xccccc@{}}
     \toprule
-    \textbf{Hasierako posizioa} $(x; y; \theta)$ & \textbf{1. kontaktua} & \textbf{1. holgura $<0{,}5$~cm} & \textbf{Alertak $<1{,}5$~cm} & \textbf{Kolpeak} & \textbf{Casi-choques} \\
+    \textbf{Hasierako posizioa} $(x; y; \theta)$ & \textbf{Ibilbidea} & \textbf{Gelaxkak} & \textbf{Goiko ezkerra} & \textbf{U-eremua} & \textbf{Kolpeak (Gazebo)} \\
     \midrule
-    1. Ohikoa: $(2{,}00; -2{,}00; 90^\circ)$ & 151,4 s & 130,6 s & 50 & 1 & 104 \\
-    2. Beheko ezkerra: $(-1{,}00; -2{,}10; 0^\circ)$ & 321,9 s & 93,0 s & 52 & 4 & 96 \\
-    3. Barrutik: $(-1{,}60; 1{,}80; -90^\circ)$ & 495,6 s & 221,7 s & 50 & 1 & 92 \\
+    1. Ohikoa: $(2{,}00; -2{,}00; 90^\circ)$ & 55,6 m & 162 & 39 gelaxka (58.~s) & \%32 & 1 \\
+    2. Beheko ezkerra: $(-1{,}00; -2{,}10; 0^\circ)$ & 54,4 m & 117 & 0 gelaxka & \%37 & 1 \\
+    3. Barrutik: $(-1{,}60; 1{,}80; -90^\circ)$ & 53,2 m & 126 & 7 gelaxka (irteera) & \%0 & 2 \\
     \bottomrule
   \end{tabularx}
-  \caption[10 minutuko proben emaitza kuantitatiboak]{10 minutuko proben emaitza kuantitatiboak \texttt{simple}\ munduan.}\label{tab:rwander-10min}
+  \caption[5 minutuko proben emaitza kuantitatiboak]{5 minutuko proben emaitza kuantitatiboak \texttt{simple}\ munduan (\texttt{atalasea} $= 0{,}25$~m).}\label{tab:rwander-5min}
 \end{table}
 
 \begin{figure}[htbp]
@@ -121,18 +121,18 @@ Enuntziatuak talkarik gabe zenbat denbora iraun dezakeen eta ingurune osora mugi
     \caption{Goiko ezkerra $(-1{,}6; 1{,}8)$.}
     \label{fig:traj-p3}
   \end{subfigure}
-  \caption[Robotaren ibilbide errealak 10 minutuko probetan]{Robotaren ibilbide errealak 10 minutuko hiru probetan. Gorriz ibilbidea; gurutze eta laukiek kontaktuak eta hurbiltze arriskutsuak adierazten dituzte.}\label{fig:ibilbideak}
+  \caption[Robotaren ibilbide errealak 5 minutuko probetan]{Robotaren ibilbide errealak 5 minutuko probetan (\texttt{atalasea} $= 0{,}25$~m). Gorriz ibilbidea; gurutze eta laukiek kontaktuak eta hurbiltze arriskutsuak adierazten dituzte.}\label{fig:ibilbideak}
 \end{figure}
 
 \subsection{Emaitzen eztabaida}
 
 \begin{itemize}
-  \item \textbf{Talkarik gabeko denbora:} Robotak ez ditu 10 minutuak kontaktu gabe betetzen. Lehen gorputz-kontaktua 151,4~s eta 495,6~s artean agertzen da. Gainera, minutuko 5 igurtzi arin inguru daude ($< 1{,}5$~cm). Horrek egiaztatzen du uneko distantzietan oinarritutako erreaktibotasunak muga fisikoak dituela robotaren atzeko ertzen aurrean.
+  \item \textbf{Talkarik gabeko denbora eta segurtasuna:} 5 minutuko probetan (304~s) robotak etengabeko mugikortasuna mantendu du gelditu gabe. Gazeboko gorputz-talken sentsoreak kolpe gutxi erregistratu ditu (1--2 kolpe probako), batez ere beheko ezkerreko izkina estuan biratzean atzeko kaxaren ertzak horma jotzeagatik.
   \item \textbf{Ingurune osora mugitzen al da?:}
   \begin{itemize}
-    \item \textbf{1. proba (\ref{fig:traj-p1}.~irudia):} Ohiko hasieratik ez da goiko ezkerreko eremura sartzen (\%0 denbora). Denboraren \%31,4 goiko eskuineko U-itxurako txokoan ematen du harrapatuta, eta pasabideen aurretik oso berandu igarotzen da (524.~segundoan, proba amaitzear dagoela).
-    \item \textbf{2. proba (\ref{fig:traj-p2}.~irudia):} Beheko ezkerretik hasita, 120.~segundoan pasabidera iritsi eta 128.~segundoan goiko ezkerreko eremuan sartzen da (34 gelaxka bisitatuz). Honek frogatzen du gure kodeak baduela pasabide estua zeharkatzeko gaitasuna.
-    \item \textbf{3. proba (\ref{fig:traj-p3}.~irudia):} Goiko ezkerreko gelaren barrutik hasten denean, 47.~segundoan pasabidetik irteten da eta ondoren ez da berriro itzultzen, maparik ez duelako sarrera non dagoen gogoratzeko.
+    \item \textbf{1. proba (\ref{fig:traj-p1}.~irudia):} Ohiko hasieratik abiatuta, 58.~segundoan pasabide estua zeharkatu eta goiko ezkerreko gelara arrakastaz sartzen da (39 gelaxka bisitatuz). Honek frogatzen du alboko irekiguneen bidez bideratzeko arauak pasabide estuak zeharkatzea ahalbidetzen duela.
+    \item \textbf{2. proba (\ref{fig:traj-p2}.~irudia):} Beheko ezkerretik hasita, zirkuituaren beheko eta eskuineko zatiak sakonki estaltzen ditu (117 gelaxka); denboraren \%37 eskuineko U-eremuan ematen du, baina biraketetan trabatu gabe.
+    \item \textbf{3. proba (\ref{fig:traj-p3}.~irudia):} Goiko ezkerreko gelaren barrutik hastean, 40.~segundo ingurura pasabidetik irten eta mapa orokorra esploratzera pasatzen da (126 gelaxka). Oroimen globalik ez duenez, behin irtenda ez da berriro sarrera estura itzultzen.
   \end{itemize}
   \item \textbf{Egoera arriskutsuak:} Bederatzi probetan kontaktuak bi gune nagusitan pilatu dira: beheko ezkerreko izkina itxian ($(-1{,}9; -2{,}2)$ inguruan) eta ezkerreko pasabide estuen sarreretan ($x \in [-1{,}9, -1{,}3]$, $y \in [-0{,}8, -0{,}4]$). Horietan biratzean, atzeko izkinek espazio handiagoa behar dute eta horma jotzen dute.
 \end{itemize}

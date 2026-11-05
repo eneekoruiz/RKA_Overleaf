@@ -1,22 +1,20 @@
 \section{Irudiaren eremuak eta pertzepzio-erabakiak}\label{sec:er-eremuak}
 
-Bigarren ariketan, robotak aurreko RGB-D kameraren bidez \texttt{yahboom\_track}\ zirkuituari jarraitu behar dio kanpoaldetik, erlojuaren orratzen noranzkoan. \texttt{road\_perception}\ nodoak (DeepLabV3 ereduan oinarritua) irudi segmentatua argitaratzen du \texttt{/road\_perception/ground}\ topic-ean: $320 \times 240$ pixeleko irudi bitarra da, non 255 balioak errepidea adierazten duen (zuria) eta 0 balioak gainerakoa (beltza).
-
-Kameraren iruditik bi azterketa-eremu nagusi definitu ditugu (\ref{fig:kamera-segmentazioa}.~irudia):
+Bigarren ariketan, robotak kameraren bidez \texttt{yahboom\_track}\ zirkuituari jarraitu behar dio kanpoaldetik. Kameraren iruditik bi azterketa-eremu nagusi definitu ditugu (\ref{fig:kamera-segmentazioa}.~irudia):
 \begin{itemize}
   \item \textbf{Aurrerapen-banda nagusia (berdez):} 100 eta 180 errenkaden arteko tartea, zabalera osoan (\texttt{cv\_image[100:180, :]}).
   \begin{itemize}
-    \item 100. errenkadatik gora hormak eta urruneko bidea daude; tarte hori sartuz gero bihurguneak goizegi detektatzen ziren.
-    \item 180. errenkadatik behera robotaren aurre-aurreko zorua dago, ia beti zuri osoa dena eta norabidearen inguruko informaziorik ematen ez duena.
-    \item Tarte honetan errepideko pixel zurien zutabeen \textbf{mediana} kalkulatzen dugu (\texttt{np.median(zutabeak)}), batezbestekoa baino sendoagoa delako zarata eta orban isolatuen aurrean.
+    \item 100. errenkadatik gora hormak eta urruneko bidea daude; tarte horretan sartuz gero kurbak goizegi detektatzen ziren.
+    \item 180. errenkadatik behera robotaren aurre-aurreko lurra dago, ia beti zuri osoa dena eta norabidearen inguruko informaziorik ematen ez duena.
+    \item Tarte honetan errepideko pixel zurien zutabeen \textbf{mediana} kalkulatzen dugu (\texttt{np.median(zutabeak)}), batezbestekoa baino sendoagoa delako zarata eta balio isolatuen aurrean.
   \end{itemize}
-  \item \textbf{Gertuko eskuin-eremua (gorriz):} 180--240 errenkadak eta 160--320 zutabeak (\texttt{cv\_image[180:, 160:]}). Eremu honetan ez da mediana kalkulatzen: eremu ez-errepidearen (beltzaren) proportzioa neurtzen da. \%25 gainditzen badu, barruko uhartea gertuegi dagoela adierazten du.
+  \item \textbf{Gertuko eskuin-eremua (gorriz):} 180--240 errenkadak eta 160--320 zutabeak (\texttt{cv\_image[180:, 160:]}). Eremu honetan ez da mediana kalkulatzen: errepidea ez den eremuaren proportzioa neurtzen da (beltza). Horrek \%25 gainditzen badu, barruko uhartea gertuegi dagoela adierazten du.
 \end{itemize}
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.88\textwidth]{erreala_kamera_eta_segmentazioa.png}
-  \caption[Kameraren irudiak eta segmentazioa]{Kameraren benetako irudiak (goian) eta DeepLabV3 segmentazioa (azpian) hiru unetan: zuzengunean, bihurgunean eta irteeran. Laukizuzen berdea aurrerapen-banda da (100--180 errenkadak) eta gorria eskuineko babes-eremua.}\label{fig:kamera-segmentazioa}
+  \caption[Kameraren irudiak eta segmentazioa]{Kameraren benetako irudiak (goian) eta segmentazioa (azpian) hiru unetan: zuzenetan, kurbetan eta kurbaren bukaeran. Laukizuzen berdea aurrerapen-banda da (100--180 errenkadak) eta gorria eskuineko babes-eremua.}\label{fig:kamera-segmentazioa}
 \end{figure}
 
 \section{Abiaduren kontrola eta kasuen banaketa}\label{sec:er-abiadurak}
@@ -27,7 +25,7 @@ Zirkuitua erlojuaren noranzkoan denez, bihurgune guztiak eskuinera dira. Kontrol
   \item \textbf{1. kasua: Errepiderik ez bandan ($n == 0$, biraketa itsua):}
   Bihurgune itxi baten erdian robotak horma besterik ez du ikusten aurrean, eta bandan ez da pixel zuririk agertzen. Egoera honetan abiadura lineala $v = 0{,}20$~m/s-ra murrizten dugu eta eskuinera indartsu biratzen dugu: $\omega = -0{,}80$~rad/s. Zirkuituko bira guztiak eskuinera direnez, biraketa itsu honek errepidea berriro kameraren bistan sartzea bermatzen du.
   
-  \item \textbf{2. kasua: Errepidea ikusten da (kontrol proportzionala offsetarekin):}
+  \item \textbf{2. kasua: Errepidea ikusten da (kontrol proportzionala):}
   Errepide-pixelak daudenean ($n > 0$), errore normalizatua kalkulatzen dugu:
   \begin{equation}
     e = \frac{\text{erdigunea} - 200}{160}
@@ -87,7 +85,7 @@ Gazeboko \texttt{yahboom\_track}\ zirkuituan bi konfigurazio probatu genituen (\
     \toprule
     \textbf{Proba} & $V_{\max}$ & \textbf{Talkak} & \textbf{Behatutako emaitza} \\
     \midrule
-    S1 & 0,60 m/s & 7 & 1. bihurgunea ondo; 2.ean kanpoko horman trabatuta \\
+    S1 & 0,60 m/s & 7 & 1. kurba ondo; 2.ean kanpoko horman trabatuta \\
     S2 & 0,30 m/s & 14 & Bira ia osoa 120 s-tan; amaieran hasieratik 0,4 m-ra \\
     \bottomrule
   \end{tabularx}
