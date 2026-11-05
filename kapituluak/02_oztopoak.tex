@@ -18,13 +18,11 @@ Sektore bakoitzeko distantziak ordenatu eta bosgarren txikiena hartzen dugu, \te
 
 Atalasea $0{,}30$~m-an jarri dugu. Handitzeak lehenago erantzutea ahalbidetzen du, baina pasabide estuetan sartzea zaildu dezake. Txikitzeak, berriz, oztopora gehiago hurbiltzea dakar.
 
-\subsection{Robotaren tamaina eta igurtzien azalpen sinplea}
+\subsection{Robotaren tamaina eta biratzeko behar duen tartea}
 
-Garrantzitsua da azpimarratzea LiDARrak sentsorearen zentrotik ($x = +0{,}04$~m) neurtzen duela, baina robota $0{,}30 \times 0{,}20$~m-ko kaxa errektangularra dela, atzealdea zentrotik $18{,}1$~cm-ra luzatzen delarik. 
+LiDARrak sentsoretik neurtzen du distantzia, baina robotaren ertzak beste toki batean daude. Neurketetan erabilitako eredua $0{,}30 \times 0{,}20$~m-ko laukizuzena da; atzeko ertza basearen jatorritik $18{,}1$~cm-ra dago, eta LiDARra $4$~cm aurrerago. Biratzean ertzak hormara hurbil daitezke, aurrealdea libre egon arren. Probetan gorputz-kontaktuak erregistratu dira; holgura-alertek, berriz, oztopora zenbat hurbildu den adierazten dute.
 
-Hori dela eta, robotak bere lekuan biratzean, atzeko izkinek eta alboek zirkunferentzia handiagoa deskribatzen dute. Ondorioz, sentsoreak $0{,}30$~m-ra horma detektatu eta biratzen hasten denean, izkinek edo alboetako gurpilek horma ukitu edo igurtzi dezakete. Ez dugu esaten robotak 10 minutuz batere ukitu gabe ibiltzea lortzen duenik: esperimentuetan ikusi dugu igurtzi arinak gertatzen direla hormen kontra biratzean, eta fenomeno fisiko hori zintzoki neurtu dugu.
-
-\section{Nola egokitu dituzu abiadurak egoera desberdinetan?}\label{sec:oz-mugimendua}
+\section{Nola egokitu dituzu abiadurak, bai lineala, bai biraketa-abiadura, egoera desberdinetan?}\label{sec:oz-mugimendua}
 
 Abiadura lineala (\texttt{speed}, m/s) eta biraketa-abiadura (\texttt{turn}, rad/s) egoera bakoitzera egokitzen ditugu:
 
@@ -87,14 +85,14 @@ Portaera erreaktibo hutsak gela irekietan bueltaka geratzeko joera du. Esplorazi
     \text{deriba} = 0{,}9 \cdot \text{deriba} + \mathcal{U}(-0{,}1,\, 0{,}1)
   \end{equation}
   Aurreko balioaren \%90 mantentzeak biraketa bat-batean aldatzea murrizten du. Ausazko balioak beste norabide batzuk hartzeko aukera ematen du. 0{,}9 mugimendua leuntzeko aukeratu dugu; ez dugu balio optimoa denik egiaztatu.
-  \item \textbf{Alboko irekiguneetara biratzea ($90^\circ$-ko izpia):} Pasabide estuen bidez bereizitako eremu isolatuetan sartzea errazteko, robotak alboko izpiekin irekigune bat detektatzen duenean ($90^\circ$-ko izpiak $> 1{,}50$~m eta alboko sektoreak $< 3 \times \text{atalasea}$), \%3ko probabilitatearekin $\text{deriba} = \pm1{,}2$~rad/s ezartzen da irekigunera bideratzeko eta ingurunea hobeto esploratzeko. Alboko $90^\circ$-ko izpiak $1{,}50$~m baino gehiago neurtzen badu eta alde bereko sektoreak $0{,}90$~m baino gutxiago, hormaren ondoan irekigune bat egon daiteke. Baldintza betetzean, irakurketa bakoitzean \%3ko aukerarekin hara biratzen du, \texttt{turn} = $\pm1{,}2$ erabiliz. Arau hori alboko hormatik urruntzeko zuzenketarik behar ez denean aztertzen da. Horregatik, sarrera baten ondotik igarotzeak ez du esan nahi beti sartuko denik.
+  \item \textbf{Alboko irekiguneetara biratzea ($90^\circ$-ko izpia):} Alboko $90^\circ$-ko izpiak $1{,}50$~m baino gehiago neurtzen badu eta alde bereko sektoreak $0{,}90$~m baino gutxiago, hormaren ondoan irekigune bat egon daiteke. Baldintza betetzean, irakurketa bakoitzean \%3ko aukerarekin hara biratzen du, \texttt{turn} = $\pm1{,}2$ erabiliz. Arau hori alboko hormatik urruntzeko zuzenketarik behar ez denean aztertzen da. Horregatik, sarrera baten ondotik igarotzeak ez du esan nahi beti sartuko denik.
 \end{itemize}
 
-\section{Zenbat denbora egon daiteke funtzionamenduan talkarik jasan gabe?}\label{sec:oz-emaitzak}
+\section{Zenbat denbora egon daiteke funtzionamenduan talkarik jasan gabe? (gehienez 10 min)}\label{sec:oz-emaitzak}
 
 Lehen gorputz-kontaktua 151,4 s, 321,9 s eta 495,6 s-an erregistratu zen. Beraz, hiru probetatik batean ere ez genuen kontakturik gabeko hamar minutuko helburua bete.
 
-Taulan gorputz-kontaktuak eta LiDARretik kalkulatutako holgura-alertak bereizten ditugu. Holgura txikia izateak gertutasuna adierazten du, baina ez du berez kontaktu fisikoa frogatzen.
+Taulan gorputz-kontaktuak eta LiDARretik kalkulatutako holgura-alertak bereizten ditugu. Holgura LiDARrak ikusitako oztopo-puntuetatik robotaren laukizuzen-eredura dagoen distantzia txikiena da. Gorputz-kontaktuen zenbaketak gurpilak baztertzen ditu, lurrarekin duten kontaktua ez kontatzeko. Holgura txikia izateak gertutasuna adierazten du, baina ez du berez kontaktu fisikoa frogatzen.
 
 \begin{table}[htbp]
   \centering\small
@@ -112,7 +110,9 @@ Taulan gorputz-kontaktuak eta LiDARretik kalkulatutako holgura-alertak bereizten
 
 0{,}5~cm-ko zutabeak gordetako alerten artean muga horretatik beherako lehen balioa erakusten du. Alerta kopuruak ez dira nahitaez maniobra desberdinen kopuruak. Proba bakoitzean 1{,}5~cm-tik beherako 50--52 holgura-alerta erregistratu ziren.
 
-\subsection{Ingurune osora mugitzen al da robota edo eskualde jakin batera mugatzen da?}\label{sec:oz-ibilbideak}
+\subsection{Denbora horretan ingurune osora mugitzen da robota edo eskualde jakin batera mugatzen da?}\label{sec:oz-ibilbideak}
+
+Erakutsi portaerak sortzen duen ibilbidea robotaren poseak ($x, y, \theta$) jasoz denboran zehar eta pose horiek grafika batean bistaratuz (ardatz horizontala: $x$; ardatz bertikala: $y$).
 
 Ez dugu ingurune osoaren estaldura egiaztatu. Hurrengo irudiek hamar minutuko ibilbide osoak erakusten dituzte, lehen kontaktuaren ondorengo mugimendua ere barne. $x$ ardatza horizontala da, eta $y$ ardatza bertikala.
 
@@ -139,12 +139,12 @@ Ez dugu ingurune osoaren estaldura egiaztatu. Hurrengo irudiek hamar minutuko ib
 \end{figure}
 
 \begin{itemize}
-  \item \textbf{1. proba (\ref{fig:traj-p1}.~irudia):} Ohiko hasieratik abiatuta, ez da goiko ezkerreko eremuan sartzen. Denboraren \%31,4 goiko eskuineko U formako eremuan eman zuen.
-  \item \textbf{2. proba (\ref{fig:traj-p2}.~irudia):} Beheko ezkerretik hasita, pasabidera iritsi eta goiko ezkerreko eremuan sartzen da. Honek frogatzen du gure kodeak baduela pasabide estua zeharkatzeko gaitasuna.
+  \item \textbf{1. proba (\ref{fig:traj-p1}.~irudia):} Ohiko hasieratik abiatuta, ez da goiko ezkerreko eremuan sartzen. Denboraren \%31,4 goiko eskuineko U formako eremuan eman zuen. Arauek uneko oztopoei erantzuten diete, baina ez dute eremu hori dagoeneko bisitatu dela kontuan hartzen. Horregatik, mugitzen jarraitu arren, toki beretara itzul daiteke.
+  \item \textbf{2. proba (\ref{fig:traj-p2}.~irudia):} Beheko ezkerretik hasita, pasabidera iritsi eta goiko ezkerreko eremuan sartzen da. Honek frogatzen du gure kodeak baduela pasabide estua zeharkatzeko gaitasuna. Emaitza horrek pasabidea zeharkatzeko gaitasuna erakusten du, baina lehen probarekin alderatuta ikusten da ez duela sarrera beti aurkitzen.
   \item \textbf{3. proba (\ref{fig:traj-p3}.~irudia):} Goiko ezkerreko gelaren barrutik hasten denean, pasabidetik irten eta ondoren ez da berriro itzultzen. Kodeak ez du sarrera non dagoen gordetzen, ezta hara itzultzeko helbururik ezartzen ere.
 \end{itemize}
 
-\subsection{Hasierako posizioa aldatuta, joera berdina erakusten al du?}\label{sec:oz-posizioak}
+\subsection{Robotaren hasierako posizioa aldatuta, joera berdina erakusten du?}\label{sec:oz-posizioak}
 
 Hasierako posizioa aldatzean bisitatutako eremuak aldatzen dira, baina toki beretara itzultzeko joera mantentzen da. Bigarren proban goiko ezkerreko eremura iristen da; lehenengoan ez, eta hirugarrenean handik atera ondoren ez da itzultzen. Hasierak eragina du, baina ausazko erabakiak ere aldatzen direnez, hiru proba hauekin ezin dugu eragin bakoitza bereizi.
 

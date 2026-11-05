@@ -4,8 +4,8 @@ from docx import Document
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT
-from docx.oxml import OxmlElement, parse_xml
-from docx.oxml.ns import nsdecls, qn
+from docx.oxml import parse_xml
+from docx.oxml.ns import nsdecls
 
 DRIVE_DIR = Path(
     r"G:\Mi unidad\Borrar - Dualismo filosófico - Eneko\Espiritualismo\Estudios\Euskal Herriko Unibertsitatea\Compartido Eneko\4. Kurtsoa\4. Kurtsoa 1. Lauhilekoa\RKA\rka_6\2. Proiektua"
@@ -30,6 +30,8 @@ REFS = {
     "tab:sim-emaitzak": "2",
     "tab:road-5saiakera": "3",
     "tab:rwander-extra": "4",
+    "lst:rwander": "1",
+    "lst:road": "2",
     "sec:oz-sektoreak": "2.1",
     "sec:oz-mugimendua": "2.2",
     "sec:oz-esplorazioa": "2.3",
@@ -50,50 +52,107 @@ CITES = {
     "gazebo": "[3]",
 }
 
+table_counter = 0
+fig_counter = 0
+
 
 def set_cell_background(cell, fill_hex):
     tcPr = cell._tc.get_or_add_tcPr()
     tcPr.append(parse_xml(f'<w:shd {nsdecls("w")} w:fill="{fill_hex}"/>'))
 
 
+def extract_braced(text: str, start_pos: int) -> tuple[str, int]:
+    """Finds the contents of { ... } starting at start_pos (where text[start_pos] == '{').
+    Returns (inside_text, end_pos_including_closing_brace)."""
+    assert text[start_pos] == '{'
+    depth = 0
+    for idx in range(start_pos, len(text)):
+        if text[idx] == '{':
+            depth += 1
+        elif text[idx] == '}':
+            depth -= 1
+            if depth == 0:
+                return text[start_pos + 1:idx], idx + 1
+    return text[start_pos + 1:], len(text)
+
+
 def clean_latex(text: str) -> str:
     t = text
-    # Replace references
-    def replace_ref(m):
-        key = m.group(1).strip()
-        return REFS.get(key, "1")
-    t = re.sub(r'\\ref\{([^}]+)\}', replace_ref, t)
-    
-    # Replace citations
-    def replace_cite(m):
-        key = m.group(1).strip()
-        return CITES.get(key, "[1]")
-    t = re.sub(r'\\cite\{([^}]+)\}', replace_cite, t)
 
-    # Basic formatting
-    t = re.sub(r'\\textbf\{([^}]+)\}', r'\1', t)
-    t = re.sub(r'\\texttt\{([^}]+)\}', r'\1', t)
-    t = re.sub(r'\\emph\{([^}]+)\}', r'\1', t)
-    t = re.sub(r'\\mathbf\{([^}]+)\}', r'\1', t)
-    t = re.sub(r'\\text\{([^}]+)\}', r'\1', t)
-    t = re.sub(r'\\mathcal\{U\}', 'U', t)
-    t = re.sub(r'\\label\{[^}]+\}', '', t)
-    t = re.sub(r'\\setlength\{[^}]+\}\{[^}]+\}', '', t)
-    t = re.sub(r'\\tabcolsep', '', t)
-    t = re.sub(r'\\bar\{t\}', 't̄', t)
-    
-    # Fractions: \frac{a}{b} -> (a / b)
-    t = re.sub(r'\\frac\{([^}]+)\}\{([^}]+)\}', r'(\1 / \2)', t)
-    
-    # Spacing and escaping
+    # 1. Strip \label{...} and \setlength{...}{...}
+    while r'\label{' in t:
+        pos = t.find(r'\label{')
+        _, end = extract_braced(t, pos + len(r'\label{') - 1)
+        t = t[:pos] + t[end:]
+
+    while r'\setlength{' in t:
+        pos = t.find(r'\setlength{')
+        _, end1 = extract_braced(t, pos + len(r'\setlength{') - 1)
+        rest = t[end1:].lstrip()
+        if rest.startswith('{'):
+            start2 = t.find('{', end1)
+            _, end2 = extract_braced(t, start2)
+            t = t[:pos] + t[end2:]
+        else:
+            t = t[:pos] + t[end1:]
+
+    # 2. Replace \ref{...}
+    while r'\ref{' in t:
+        pos = t.find(r'\ref{')
+        key, end = extract_braced(t, pos + len(r'\ref{') - 1)
+        clean_key = key.strip()
+        val = REFS.get(clean_key, "1")
+        t = t[:pos] + val + t[end:]
+
+    # 3. Replace \cite{...}
+    while r'\cite{' in t:
+        pos = t.find(r'\cite{')
+        key, end = extract_braced(t, pos + len(r'\cite{') - 1)
+        clean_key = key.strip()
+        val = CITES.get(clean_key, "")
+        t = t[:pos] + val + t[end:]
+
+    # 4. Replace fractions: \frac{num}{den}
+    while r'\frac{' in t:
+        pos = t.find(r'\frac{')
+        num, end1 = extract_braced(t, pos + len(r'\frac{') - 1)
+        rest = t[end1:].lstrip()
+        if rest.startswith('{'):
+            start2 = t.find('{', end1)
+            den, end2 = extract_braced(t, start2)
+            clean_num = clean_latex(num)
+            clean_den = clean_latex(den)
+            if '+' in clean_num or '-' in clean_num:
+                frac_str = f"({clean_num}) / {clean_den}"
+            else:
+                frac_str = f"{clean_num} / {clean_den}"
+            t = t[:pos] + frac_str + t[end2:]
+        else:
+            t = t[:pos] + clean_latex(num) + t[end1:]
+
+    # 5. Unwrap formatting macros: \textbf{...}, \texttt{...}, etc.
+    for macro in [r'\textbf{', r'\texttt{', r'\emph{', r'\mathbf{', r'\text{']:
+        while macro in t:
+            pos = t.find(macro)
+            inner, end = extract_braced(t, pos + len(macro) - 1)
+            clean_inner = clean_latex(inner)
+            t = t[:pos] + clean_inner + t[end:]
+
+    # 6. Specific math/symbols
+    t = t.replace(r'\mathcal{U}', 'U')
+    t = t.replace(r'\bar{t}', 't̄')
+    t = t.replace(r'\max', 'max')
+    t = t.replace(r'\min', 'min')
+    t = t.replace(r'V_{\max}', 'V_max')
+    t = t.replace(r'V_{\min}', 'V_min')
+    t = re.sub(r'([A-Za-z]+)_\{([^}]+)\}', r'\1_\2', t)
+
+    t = t.replace('{,}', ',')
     t = t.replace('~', ' ')
     t = t.replace(r'\,', ' ')
     t = t.replace(r'\_', '_')
     t = t.replace(r'\%', '%')
     t = t.replace(r'\dots', '...')
-    t = t.replace('{,}', ',')
-    
-    # Math symbols
     t = t.replace(r'\pm', '±')
     t = t.replace(r'\le', '≤')
     t = t.replace(r'\ge', '≥')
@@ -105,9 +164,15 @@ def clean_latex(text: str) -> str:
     t = t.replace(r'\times', '×')
     t = t.replace(r'^\circ', '°')
     t = t.replace(r'\circ', '°')
-    t = re.sub(r'\$([^$]+)\$', r'\1', t)
-    
-    # Clean up double spaces or residual backslashes
+    t = t.replace(r'\tabcolsep', '')
+
+    # Strip inline $ math delimiters
+    t = t.replace('$', '')
+
+    # Trailing backslashes before spaces or end of string
+    t = re.sub(r'\\(?=\s|$|[.,:;])', '', t)
+
+    # Clean double spaces
     t = re.sub(r' +', ' ', t)
     return t.strip()
 
@@ -118,34 +183,49 @@ def add_code_block(doc, code_text):
     cell = tbl.cell(0, 0)
     set_cell_background(cell, "F4F5F7")
     cell.width = Inches(6.5)
-    
+
+    # Prevent row split across pages
+    trPr = tbl.rows[0]._tr.get_or_add_trPr()
+    trPr.append(parse_xml(f'<w:cantSplit {nsdecls("w")}/>'))
+
     p = cell.paragraphs[0]
     p.paragraph_format.space_before = Pt(4)
     p.paragraph_format.space_after = Pt(4)
     p.paragraph_format.line_spacing = 1.15
-    run = p.add_run(code_text.strip())
+    p.paragraph_format.keep_together = True
+
+    clean_code = code_text.strip()
+    run = p.add_run(clean_code)
     run.font.name = "Consolas"
-    run.font.size = Pt(9.5)
+    run.font.size = Pt(8.5)
     run.font.color.rgb = RGBColor(30, 41, 59)
-    doc.add_paragraph().paragraph_format.space_after = Pt(4)
+
+    p_after = doc.add_paragraph()
+    p_after.paragraph_format.space_before = Pt(0)
+    p_after.paragraph_format.space_after = Pt(4)
 
 
 def parse_latex_table(doc, table_text: str):
+    global table_counter
     caption = ""
-    m_cap = re.search(r'\\caption(?:\[[^\]]*\])?\{([^}]+)\}', table_text)
+    m_cap = re.search(r'\\caption(?:\[[^\]]*\])?\{', table_text)
     if m_cap:
-        caption = clean_latex(m_cap.group(1))
+        start_brace = m_cap.end() - 1
+        raw_cap, _ = extract_braced(table_text, start_brace)
+        caption = clean_latex(raw_cap)
 
-    # Extract rows between \midrule (or \toprule) and \bottomrule
+    # Extract table rows
     rows = []
     for line in table_text.splitlines():
         line = line.strip()
         if not line or any(cmd in line for cmd in ("\\begin", "\\end", "\\toprule", "\\midrule", "\\bottomrule", "\\caption", "\\centering", "\\label", "\\setlength")):
             continue
         if "\\multicolumn" in line:
-            m_txt = re.search(r'\{@\{\}l\}\{([^}]+)\}', line)
+            m_txt = re.search(r'\{@\{\}l\}\{', line)
             if m_txt:
-                rows.append([clean_latex(m_txt.group(1))])
+                start_brace = m_txt.end() - 1
+                inner, _ = extract_braced(line, start_brace)
+                rows.append([clean_latex(inner)])
             continue
         if "\\\\" in line:
             line = line.replace("\\\\", "")
@@ -159,21 +239,26 @@ def parse_latex_table(doc, table_text: str):
     num_cols = max(len(r) for r in rows)
     tbl = doc.add_table(rows=len(rows), cols=num_cols)
     tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
-    
+
+    table_counter += 1
+
     for r_idx, r_data in enumerate(rows):
         row_obj = tbl.rows[r_idx]
         trPr = row_obj._tr.get_or_add_trPr()
         trPr.append(parse_xml(f'<w:cantSplit {nsdecls("w")}/>'))
+        if r_idx == 0:
+            trPr.append(parse_xml(f'<w:tblHeader {nsdecls("w")}/>'))
 
         is_header = (r_idx == 0)
         is_colspan = (len(r_data) == 1 and num_cols > 1)
-        
+
         if is_colspan:
             cell = tbl.cell(r_idx, 0)
             cell.text = r_data[0]
             for c_idx in range(1, num_cols):
                 cell.merge(tbl.cell(r_idx, c_idx))
-            cell.paragraphs[0].runs[0].bold = True
+            if cell.paragraphs[0].runs:
+                cell.paragraphs[0].runs[0].bold = True
             set_cell_background(cell, "F8FAFC")
             continue
 
@@ -192,7 +277,10 @@ def parse_latex_table(doc, table_text: str):
 
     if caption:
         p_cap = doc.add_paragraph()
-        r = p_cap.add_run(f"Taula: {caption}")
+        p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_cap.paragraph_format.space_before = Pt(3)
+        p_cap.paragraph_format.space_after = Pt(6)
+        r = p_cap.add_run(f"{table_counter}. taula: {caption}")
         r.font.size = Pt(9.5)
         r.italic = True
         r.font.color.rgb = RGBColor(100, 116, 139)
@@ -201,27 +289,110 @@ def parse_latex_table(doc, table_text: str):
 
 
 def parse_figure_block(doc, fig_text: str):
-    subfigs = re.findall(
-        r'\\begin\{subfigure\}(?:\[[^\]]*\])?\{[^}]*\}\s*\\includegraphics(?:\[[^\]]*\])?\{([^}]+)\}\s*\\caption\{([^}]+)\}',
-        fig_text
-    )
-    if subfigs:
+    global fig_counter
+    fig_counter += 1
+
+    # Extract subfigures if any
+    subfig_matches = list(re.finditer(r'\\begin\{subfigure\}(?:\[[^\]]*\])?\{[^}]*\}', fig_text))
+    subfigs = []
+    for sf in subfig_matches:
+        start_sf = sf.start()
+        end_sf = fig_text.find(r'\end{subfigure}', start_sf)
+        sf_content = fig_text[start_sf:end_sf]
+        m_img = re.search(r'\\includegraphics(?:\[[^\]]*\])?\{([^}]+)\}', sf_content)
+        m_cap = re.search(r'\\caption(?:\[[^\]]*\])?\{', sf_content)
+        subcap = ""
+        if m_cap:
+            raw_c, _ = extract_braced(sf_content, m_cap.end() - 1)
+            subcap = clean_latex(raw_c)
+        if m_img:
+            subfigs.append((m_img.group(1).strip(), subcap))
+
+    # Main outer caption
+    no_subfigs = re.sub(r'\\begin\{subfigure\}.*?\\end\{subfigure\}', '', fig_text, flags=re.DOTALL)
+    m_main_cap = re.search(r'\\caption(?:\[[^\]]*\])?\{', no_subfigs)
+    cap_text = ""
+    if m_main_cap:
+        raw_mc, _ = extract_braced(no_subfigs, m_main_cap.end() - 1)
+        cap_text = clean_latex(raw_mc)
+
+    if len(subfigs) == 3:
+        # 3 trajectories: 2 on top (Row 1), 1 centered below (Row 2)
+        # Width: 3.05 inches each for clear axis readability
+        tbl = doc.add_table(rows=2, cols=2)
+        tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
+
+        # Row 1: Pose 1 & Pose 2
+        for c_idx in range(2):
+            cell = tbl.cell(0, c_idx)
+            img_name, subcap = subfigs[c_idx]
+            img_path = BASE_DIR / "irudiak" / img_name
+            p = cell.paragraphs[0]
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p.paragraph_format.space_before = Pt(2)
+            p.paragraph_format.space_after = Pt(2)
+            if img_path.exists():
+                p.add_run().add_picture(str(img_path), width=Inches(3.05))
+            p_cap = cell.add_paragraph()
+            p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p_cap.paragraph_format.space_after = Pt(4)
+            r_c = p_cap.add_run(f"({chr(97 + c_idx)}) {subcap}")
+            r_c.font.size = Pt(8.5)
+            r_c.italic = True
+            r_c.font.color.rgb = RGBColor(71, 85, 105)
+
+        # Row 2: Pose 3 centered across 2 merged cells
+        cell_bottom = tbl.cell(1, 0)
+        cell_bottom.merge(tbl.cell(1, 1))
+        img_name, subcap = subfigs[2]
+        img_path = BASE_DIR / "irudiak" / img_name
+        p_b = cell_bottom.paragraphs[0]
+        p_b.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_b.paragraph_format.space_before = Pt(2)
+        p_b.paragraph_format.space_after = Pt(2)
+        if img_path.exists():
+            p_b.add_run().add_picture(str(img_path), width=Inches(3.05))
+        p_b_cap = cell_bottom.add_paragraph()
+        p_b_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_b_cap.paragraph_format.space_after = Pt(4)
+        r_b_c = p_b_cap.add_run(f"(c) {subcap}")
+        r_b_c.font.size = Pt(8.5)
+        r_b_c.italic = True
+        r_b_c.font.color.rgb = RGBColor(71, 85, 105)
+
+        for row in tbl.rows:
+            trPr = row._tr.get_or_add_trPr()
+            trPr.append(parse_xml(f'<w:cantSplit {nsdecls("w")}/>'))
+
+        tblPr = tbl._tbl.tblPr
+        tblBorders = parse_xml(
+            f'<w:tblBorders {nsdecls("w")}>'
+            f'<w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/>'
+            f'<w:insideH w:val="none"/><w:insideV w:val="none"/>'
+            f'</w:tblBorders>'
+        )
+        tblPr.append(tblBorders)
+
+    elif subfigs:
         tbl = doc.add_table(rows=1, cols=len(subfigs))
         tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
         for col_idx, (img_name, subcap) in enumerate(subfigs):
             cell = tbl.cell(0, col_idx)
-            img_path = BASE_DIR / "irudiak" / img_name.strip()
+            img_path = BASE_DIR / "irudiak" / img_name
             p = cell.paragraphs[0]
             p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p.paragraph_format.space_before = Pt(2)
+            p.paragraph_format.space_after = Pt(2)
             if img_path.exists():
-                p.add_run().add_picture(str(img_path), width=Inches(1.95))
+                p.add_run().add_picture(str(img_path), width=Inches(3.1))
             p_cap = cell.add_paragraph()
             p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            r_c = p_cap.add_run(clean_latex(subcap))
+            p_cap.paragraph_format.space_after = Pt(4)
+            r_c = p_cap.add_run(subcap)
             r_c.font.size = Pt(8.5)
             r_c.italic = True
-        
-        # Remove borders
+        for row in tbl.rows:
+            row._tr.get_or_add_trPr().append(parse_xml(f'<w:cantSplit {nsdecls("w")}/>'))
         tblPr = tbl._tbl.tblPr
         tblBorders = parse_xml(
             f'<w:tblBorders {nsdecls("w")}>'
@@ -240,16 +411,17 @@ def parse_figure_block(doc, fig_text: str):
                 p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
                 p_img.paragraph_format.space_before = Pt(6)
                 p_img.paragraph_format.space_after = Pt(4)
-                width = Inches(5.5) if "kamera" in img_name or "abiadurak" in img_name else Inches(4.5)
+                p_img.paragraph_format.keep_with_next = True
+                width = Inches(5.2) if ("kamera" in img_name or "abiadurak" in img_name) else Inches(4.5)
                 p_img.add_run().add_picture(str(img_path), width=width)
 
-    m_cap = re.search(r'\\caption(?:\[[^\]]*\])?\{([^}]+)\}', fig_text)
-    if m_cap:
-        cap_text = clean_latex(m_cap.group(1))
+    if cap_text:
         p_cap = doc.add_paragraph()
         p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_cap.paragraph_format.space_before = Pt(2)
         p_cap.paragraph_format.space_after = Pt(8)
-        r = p_cap.add_run(f"Irudia: {cap_text}")
+        p_cap.paragraph_format.keep_with_next = True
+        r = p_cap.add_run(f"{fig_counter}. irudia: {cap_text}")
         r.font.size = Pt(9.5)
         r.italic = True
         r.font.color.rgb = RGBColor(71, 85, 105)
@@ -259,15 +431,11 @@ def parse_chapter_content(doc, content: str):
     lines = content.splitlines()
     in_code = False
     code_lines = []
-    in_table = False
-    table_lines = []
-    in_figure = False
-    figure_lines = []
-    
+
     i = 0
     while i < len(lines):
         line = lines[i].strip()
-        
+
         # Comments
         if line.startswith("%"):
             i += 1
@@ -291,7 +459,6 @@ def parse_chapter_content(doc, content: str):
 
         # Table block
         if "\\begin{table}" in line:
-            in_table = True
             table_lines = [line]
             i += 1
             while i < len(lines) and "\\end{table}" not in lines[i]:
@@ -301,10 +468,8 @@ def parse_chapter_content(doc, content: str):
                 table_lines.append(lines[i])
                 i += 1
             parse_latex_table(doc, "\n".join(table_lines))
-            in_table = False
             continue
         elif "\\begin{tabular" in line:
-            in_table = True
             table_lines = [line]
             i += 1
             while i < len(lines) and "\\end{tabular" not in lines[i]:
@@ -314,12 +479,10 @@ def parse_chapter_content(doc, content: str):
                 table_lines.append(lines[i])
                 i += 1
             parse_latex_table(doc, "\n".join(table_lines))
-            in_table = False
             continue
 
         # Figure block
         if "\\begin{figure}" in line:
-            in_figure = True
             figure_lines = [line]
             i += 1
             while i < len(lines) and "\\end{figure}" not in lines[i]:
@@ -329,28 +492,27 @@ def parse_chapter_content(doc, content: str):
                 figure_lines.append(lines[i])
                 i += 1
             parse_figure_block(doc, "\n".join(figure_lines))
-            in_figure = False
             continue
 
         # Headings
-        m_sec = re.match(r'\\section\{([^}]+)\}', line)
-        if m_sec:
-            doc.add_heading(clean_latex(m_sec.group(1)), level=2)
+        if line.startswith(r'\section{'):
+            inner, _ = extract_braced(line, len(r'\section'))
+            doc.add_heading(clean_latex(inner), level=2)
             i += 1
             continue
 
-        m_ssec = re.match(r'\\subsection\{([^}]+)\}', line)
-        if m_ssec:
-            doc.add_heading(clean_latex(m_ssec.group(1)), level=3)
+        if line.startswith(r'\subsection{'):
+            inner, _ = extract_braced(line, len(r'\subsection'))
+            doc.add_heading(clean_latex(inner), level=3)
             i += 1
             continue
 
-        m_para = re.match(r'\\paragraph\{([^}]+)\}', line)
-        if m_para:
+        if line.startswith(r'\paragraph{'):
+            inner, end_pos = extract_braced(line, len(r'\paragraph'))
             p = doc.add_paragraph()
-            r = p.add_run(clean_latex(m_para.group(1)) + " ")
+            r = p.add_run(clean_latex(inner) + " ")
             r.bold = True
-            rest = line[m_para.end():].strip()
+            rest = line[end_pos:].strip()
             if rest:
                 p.add_run(clean_latex(rest))
             i += 1
@@ -359,15 +521,16 @@ def parse_chapter_content(doc, content: str):
         # Enumerate / Itemize
         if line.startswith("\\item"):
             item_text = line[len("\\item"):].strip()
-            m_bold = re.match(r'\\textbf\{([^}]+)\}', item_text)
-            if m_bold:
-                prefix = m_bold.group(1)
-                body = item_text[m_bold.end():].strip()
+            if item_text.startswith(r'\textbf{'):
+                start_brace = len(r'\textbf')
+                inner, end_pos = extract_braced(item_text, start_brace)
+                prefix = clean_latex(inner)
+                body = clean_latex(item_text[end_pos:])
                 p = doc.add_paragraph(style='List Bullet')
-                r = p.add_run(clean_latex(prefix) + " ")
+                r = p.add_run(prefix + " ")
                 r.bold = True
                 if body:
-                    p.add_run(clean_latex(body))
+                    p.add_run(body)
             else:
                 p = doc.add_paragraph(clean_latex(item_text), style='List Bullet')
             i += 1
@@ -381,23 +544,26 @@ def parse_chapter_content(doc, content: str):
                 eq_lines.append(lines[i].strip())
                 i += 1
             i += 1
-            eq_text = clean_latex(" ".join(eq_lines))
+            raw_eq = " ".join(eq_lines)
+            eq_text = clean_latex(raw_eq)
             p_eq = doc.add_paragraph()
             p_eq.alignment = WD_ALIGN_PARAGRAPH.CENTER
             p_eq.paragraph_format.space_before = Pt(6)
             p_eq.paragraph_format.space_after = Pt(6)
+            p_eq.paragraph_format.keep_with_next = True
             r_eq = p_eq.add_run(eq_text)
             r_eq.italic = True
             r_eq.font.size = Pt(11)
             continue
 
         # Bold question prompts (from peer review / guide)
-        m_q = re.match(r'\\textbf\{([^}]+)\}', line)
-        if m_q and line.endswith("}"):
+        if line.startswith(r'\textbf{') and line.endswith("}"):
+            inner, _ = extract_braced(line, len(r'\textbf'))
             p = doc.add_paragraph()
             p.paragraph_format.space_before = Pt(10)
             p.paragraph_format.space_after = Pt(4)
-            r = p.add_run(clean_latex(m_q.group(1)))
+            p.paragraph_format.keep_with_next = True
+            r = p.add_run(clean_latex(inner))
             r.bold = True
             r.font.color.rgb = RGBColor(15, 23, 42)
             i += 1
@@ -428,15 +594,39 @@ def parse_chapter_content(doc, content: str):
             i += 1
 
 
+def add_xml_field(para, field_name):
+    run = para.add_run()
+    run.font.size = Pt(9)
+    run.font.color.rgb = RGBColor(100, 116, 139)
+    fld = parse_xml(f'<w:fldSimple {nsdecls("w")} w:instr="{field_name}"/>')
+    run._r.append(fld)
+
+
 def build_document():
+    global table_counter, fig_counter
+    table_counter = 0
+    fig_counter = 0
+
     doc = Document()
-    
-    # Configure margins
+
+    # Configure margins and page numbering footer
     for section in doc.sections:
         section.top_margin = Inches(1)
         section.bottom_margin = Inches(1)
         section.left_margin = Inches(1)
         section.right_margin = Inches(1)
+
+        footer = section.footer
+        p_ftr = footer.paragraphs[0]
+        p_ftr.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        r_txt = p_ftr.add_run("Orria ")
+        r_txt.font.size = Pt(9)
+        r_txt.font.color.rgb = RGBColor(100, 116, 139)
+        add_xml_field(p_ftr, "PAGE")
+        r_sep = p_ftr.add_run(" / ")
+        r_sep.font.size = Pt(9)
+        r_sep.font.color.rgb = RGBColor(100, 116, 139)
+        add_xml_field(p_ftr, "NUMPAGES")
 
     # Title
     p_title = doc.add_paragraph()
@@ -482,7 +672,7 @@ def build_document():
         f_path = BASE_DIR / "kapituluak" / filename
         if not f_path.exists():
             continue
-        
+
         doc.add_heading(ch_title, level=1)
         content = f_path.read_text(encoding="utf-8")
         parse_chapter_content(doc, content)
@@ -496,7 +686,7 @@ def build_document():
                 pass
         doc.save(str(loc_p))
         print(f"[OK] Guardado localmente: {loc_p.name}")
-    
+
     # Save to Google Drive
     if DRIVE_DIR.exists():
         for drive_p in [OUTPUT_DOCX_PARALLEL, OUTPUT_DOCX_MAIN]:
