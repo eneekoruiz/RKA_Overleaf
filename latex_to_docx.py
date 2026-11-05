@@ -470,14 +470,6 @@ def build_document():
     r_meta.font.size = Pt(10)
     r_meta.font.color.rgb = RGBColor(100, 116, 139)
 
-    doc.add_heading("Laburpena", level=1)
-    laburpena_path = BASE_DIR / "kapituluak" / "laburpena.tex"
-    if laburpena_path.exists():
-        text = laburpena_path.read_text(encoding="utf-8")
-        paras = [p.strip() for p in text.split("\n\n") if p.strip() and not p.strip().startswith("%")]
-        for p in paras:
-            doc.add_paragraph(clean_latex(p))
-
     chapters = [
         ("1. Sarrera", "01_sarrera.tex"),
         ("2. Oztopoak ekiditen (LiDAR)", "02_oztopoak.tex"),

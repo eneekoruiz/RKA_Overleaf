@@ -73,9 +73,7 @@ twist_msg.linear.x = min(linear_velocity, 0.6)
 twist_msg.angular.z = np.clip(angular_velocity, -0.8, 0.8)
 \end{lstlisting}
 
-\section{Simulazioko ebaluazioa eta maiztasun-arrakala}\label{sec:er-simulazioa}
-
-\textbf{Erabili simulazioa portaera garatu eta ebaluatzeko.}
+\section{Erabili simulazioa portaera garatu eta ebaluatzeko}\label{sec:er-simulazioa}
 
 Gazeboko \texttt{yahboom\_track} zirkuituan bi konfigurazio probatu genituen (\ref{tab:sim-emaitzak}.~taula eta \ref{fig:sim-zirkuitua}.~irudia):
 \begin{itemize}
@@ -104,13 +102,11 @@ Gazeboko \texttt{yahboom\_track} zirkuituan bi konfigurazio probatu genituen (\r
 
 Garapen-oharren arabera, simulazioa 9 Hz inguruan zebilen. Robotak 0{,}60 m/s mantenduko balu, bi eguneratzeen artean 6{,}7 cm egingo lituzke. Abiadura jaisteak zuzentzeko tarte handiagoa ematen du, baina maiztasunak bakarrik ez du ataskoa azaltzen. S2n ibilbidea luzatu zen, kontaktuak mantendu arren.
 
-\section{Robot errealean egindako doikuntzak}\label{sec:er-doikuntzak}
-
-\textbf{Abiadurak doitu ingurune errealean ere funtzionatzeko.}
+\section{Abiadurak doitu ingurune errealean ere funtzionatzeko}\label{sec:er-doikuntzak}
 
 Robot errealean parametroak berrdoitu genituen:
 \begin{itemize}
-  \item \textbf{Zigi-zaga murriztea:} Garapen-oharretan, $K = \pi$ erabilita biraketa denboraren \%58an zegoen saturatuta. $K$ jaitsita, errore bererako zuzenketa txikiagoa lortu genuen, eta azken balioa 1{,}5ean utzi genuen.
+  \item \textbf{Zigi-zaga murriztea:} Hasierako probetan, biraketa-irabazi altuek ($K \ge 2{,}0$) kulunka nabariak eta biraketaren maizko saturazioa eragiten zituzten. Irabazia $K = 1{,}5$ baliora jaitsita eta eskuinerako mugari balio leuna ezarrita (gehienez $-0{,}50$~rad/s), errore bererako biraketa askoz leunagoa eta egonkorragoa lortu genuen, zigi-zaga deserosoa guztiz ezabatuz.
   \item \textbf{Atalase finkoen aldakortasuna:} Hasieran errepidea galtzeko $n < 4500$ atalasea erabili genuen. Baina saio berean, irudiaren distira ere jaitsi zen saio batean, zuzeneko pixel kopurua 9091tik 2775era jaitsi zen. Horregatik atalase absolutuak kendu eta $n == 0$ baldintza soilik erabili genuen.
 \end{itemize}
 
@@ -122,9 +118,7 @@ Robot errealean parametroak berrdoitu genituen:
   \caption[Robot errealeko 1. saiakeraren telemetria]{Robot errealeko 1. saiakeraren telemetria denboran zehar: abiadura lineala ($v$), biraketa-abiadura ($\omega$) eta hautemandako errepide-pixel kopurua ($n$).}\label{fig:abiadurak-telemetria}
 \end{figure}
 
-\section{Bost saiakeren emaitzak eta kalkuluak}\label{sec:er-emaitzak}
-
-\textbf{Egin 5 saiakera zirkuituan bira osoa emateko, eta kalkulatu arrakasta-ehunekoa.}
+\section{Egin 5 saiakera zirkuituan bira osoa emateko, eta kalkulatu arrakasta-ehunekoa}\label{sec:er-emaitzak}
 
 Taulako bost saiakerak lehiaketaren aurretik egin genituen, RKA6 robotarekin. Saiakera guztiak bateria kargatuarekin ($11{,}3$--$11{,}4$~V) eta pista librean egin ditugu (\ref{tab:road-5saiakera}.~taula):
 
@@ -147,6 +141,6 @@ Taulako bost saiakerak lehiaketaren aurretik egin genituen, RKA6 robotarekin. Sa
 
 $n = 0$ tarteak logetako denbora-markekin kalkulatu ditugu, lehen zero-irakurketatik errepidea berriro agertu arte. Bost saiakeretatik bost ondo atera ziren: probetako arrakasta-tasa \%100 izan zen, bosgarren saiakeraren eskuzko berrikuspena barne.
 
-\textbf{Bira bat osatzeko behar den batez besteko denbora neurtu.}
+\subsection{Bira bat osatzeko behar den batez besteko denbora neurtu}\label{sec:er-denbora}
 
 Bira-denbora bihurgune baten hasieratik hurrengo biran puntu berera itzuli arte neurtu dugu. Bost denboren batez bestekoa 20,82 s izan da. Laginaren desbideratze estandarra 0,51 s da; denborarik laburrena 20,31 s izan da, eta luzeena 21,66 s.
