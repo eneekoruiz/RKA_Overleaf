@@ -28,7 +28,7 @@ REFS = {
     "tab:rwander-10min": "1",
     "tab:rwander-5min": "1",
     "tab:sim-emaitzak": "2",
-    "tab:road-5saiakera": "3",
+    "tab:road-5saiakera": "2",
     "tab:rwander-extra": "4",
     "lst:rwander": "1",
     "lst:road": "2",

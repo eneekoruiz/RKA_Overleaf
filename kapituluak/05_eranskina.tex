@@ -1,37 +1,3 @@
-\section{Proba osagarriak Gazeboko simple munduan}\label{sec:eranskina-probak}
+Gazeboko \texttt{simple} munduan hainbat iraupeneko (5, 7 eta 10 minutu) bederatzi proba osagarri egin genituen hasierako posizio desberdinetatik. Emaitzek erakutsi zuten robotak eremua esploratzeko gaitasuna duela, baina pasabide estuetan sartzea neurri handi batean hasierako posizioaren eta biraketa erreaktiboen araberakoa dela: erdialdetik abiatuta 17 segundora sartzen den bitartean, pasabide estuenaren sarreratik bertatik hasita kanpoko hormek aldendu egiten dute biraketetan. Proba horietan zehar, $0{,}5$~cm-tik beherako holgura-alertak goiz agertu ziren (16--221~s artean), eta erregistratutako gorputz-kontaktuak biraketa-maniobretan gertatu ziren.
 
-Testu nagusian hamar minutuko hiru probak aztertu dira. Hemen 5 eta 7 minutuko beste sei proba gehigarrien emaitzak laburbiltzen dira (\ref{tab:rwander-extra}.~taula), hasierako posizio desberdinen eragina osatzeko:
-
-\begin{table}[htbp]
-  \centering\small
-  \begin{tabularx}{\textwidth}{@{}X c c c@{}}
-    \toprule
-    \textbf{Iraupena eta hasiera} & \textbf{1. alerta $< 0{,}5$~cm} & \textbf{Gorputz-kontaktuak} & \textbf{Goiko ezkerreko eremua} \\
-    \midrule
-    10 min $\cdot$ ohikoa $(2{,}0; -2{,}0)$ & 130,6 s & 1 & Ez da sartzen (\%0) \\
-    10 min $\cdot$ beheko ezkerra $(-1{,}0; -2{,}1)$ & 93,0 s & 4 & Sartzen da, 127,9 s (\%13) \\
-    10 min $\cdot$ barrutik $(-1{,}6; 1{,}8)$ & 221,7 s & 1 & Barruan hasi eta irten (\%8) \\
-    \midrule
-    5 min $\cdot$ ohikoa $(2{,}0; -2{,}0)$ & 30,9 s & 0 & Ez da sartzen \\
-    5 min $\cdot$ beheko ezkerra $(-1{,}0; -2{,}1)$ & 197,8 s & 2 & Sartzen da, 103,0 s \\
-    5 min $\cdot$ barrutik $(-1{,}6; 1{,}8)$ & 38,3 s & 1 & Barruan hasi eta irten \\
-    \midrule
-    7 min $\cdot$ erdialdea $(0{,}4; -0{,}7)$ & 84,8 s & 0 & Sartzen da, 17,4 s \\
-    7 min $\cdot$ U-formako eremua $(1{,}0; 2{,}0)$ & 44,1 s & 3 & Sartzen da, 382,6 s \\
-    7 min $\cdot$ pasabidearen sarrera $(-2{,}2; -0{,}6)$ & 16,0 s & 2* & Ez da sartzen (eskuinera jotzen du) \\
-    \bottomrule
-  \end{tabularx}
-  \caption[Hasierako bederatzi posizioen ebaluazioa]{Hasierako bederatzi posizioen ebaluazioa \texttt{simple}\ munduan. *~Proba honetan gorputz-kontaktu bat 2{,}0~s-an erregistratu zen, hasierako kokapenaren ondoan.}\label{tab:rwander-extra}
-\end{table}
-
-Ehunekoek lehen 600 segundoetan goiko ezkerreko eremuan emandako denbora adierazten dute ($x < -0{,}5$; $y > 0{,}5$).
-
-Emaitza hauek ondorio nagusia berresten dute: robotak badu ingurunean zehar mugitzeko gaitasuna, baina sarrera estua aurkitzea hasierako posizioaren eta ausazko erabakien araberakoa da. Erdian hasita 17~s-ra sartzen da; pasabide estuenaren ahoan hasita ($0{,}57$~m), ordea: Ez da sartzen, pasabidearen ondoan hasi arren. Alboko hormetatik urruntzeko arauak sarreratik aldendu dezake, baina une hartako erabaki-erregistrorik gabe ezin dugu kausa zehatza ziurtatu.
-
-\section{Erabilitako materialak eta biltegia}\label{sec:eranskina-materialak}
-
-Irakasgaiko praktika-gidan (Elena Lazkano, «Oztopoak ekiditen eta errepideari jarraitzen», 2026) eskatutako kode guztiak, telemetria-fitxategiak eta erregistro gordinak honela antolatu dira:
-\begin{itemize}
-  \item \textbf{LiDAR ariketa (\texttt{rwander}):} \texttt{codigo/rwander.py}\ azaldutako bertsio nagusia da; \texttt{herramientas/gz\_metrics.py}\ kontaktuak eta holgura neurtzeko scripta da; \texttt{pruebas\_10min/}, \texttt{pruebas\_5min/}\ eta \texttt{pruebas\_7min/}\ karpetetan CSV fitxategiak eta ibilbideen grafikoak daude.
-  \item \textbf{Kamera ariketa (\texttt{road\_following}):} \texttt{road\_following\_final.py}\ azaldutako azken nodoa da; \texttt{datuak/}\ karpetan bost saiakeren nodo-logak (\texttt{.log}) eta JSON fitxategiak daude; \texttt{irudiak/}\ karpetan grafiko guztiak jaso dira.
-\end{itemize}
+Praktikan garatutako kode guztiak eta telemetria-erregistroak proiektuaren biltegian antolatu dira: \texttt{rwander.py} (LiDAR kontrola) eta \texttt{gz\_metrics.py} (talken eta holguren neurketa) lehen ariketarako, eta \texttt{road\_following\_final.py} (kameraren bidezko errepide-jarraipena) bigarrenerako, dagokien exekuzio-logekin eta grafikoekin batera.
