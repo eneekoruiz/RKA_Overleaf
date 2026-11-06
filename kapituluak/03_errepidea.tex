@@ -82,15 +82,12 @@ twist_msg.angular.z = np.clip(angular_velocity, -0.5, 0.5)
 \section[Abiadurak doitu ingurune errealean ere funtzionatzeko][Ingurune errealeko doikuntzak]{Abiadurak doitu ingurune errealean ere funtzionatzeko}\label{sec:er-doikuntzak}
 
 Simulazioko kodearen (\ref{lst:road-sim}.~kode-zatia) eta pista errealeko azken bertsioaren (\ref{lst:road}.~kode-zatia) artean aldaketa sakonak egin behar izan genituen errealitate fisikora egokitzeko:
-\begin{itemize}[leftmargin=*,itemsep=1pt,parsep=0pt,topsep=1pt,partopsep=0pt]
-  \item \textbf{Abiadura eta inertzia:} Simulazioan $0{,}30$~m/s abiadura egonkorra da ($\approx 40$~s birako). Pista errealean abiadura bikoiztu genuen ($0{,}60$~m/s, $20{,}82$~s lortuz); inertzia handiago horrek kurbetan balaztatze dinamikoa eskatu zuen ($v = 0{,}6 \cdot (1 - 0{,}7 |e|)$).
-  \item \textbf{Mediana batezbestekoaren ordez:} Gazebon segmentazioa sintetikoa da; mundu errealean zoru-islek zarata sortzen dute. \texttt{np.median}-ek zarata isolatua iragazten du, \texttt{np.mean}-ek eragindako kolpeak saihestuz.
-  \item \textbf{+40 pixeleko desplazamendua:} Errealitatean barruko marra zapaltzeak penalizazioak dakartza. Erreferentzia 200. zutabera lerratuta, robota kanpoko aldetik doa babestuta.
-  \item \textbf{Irabazia ($K=1{,}5$) eta eskuin-muga:} Simulazioko $K=5{,}0$ balioak kulunka gogorra sortzen zuen gurpilen marruskaduragatik. $K=1{,}5$-era jaitsi eta eskuin-bira $-0{,}50$~rad/s-ra mugatu genuen kurbatik irtetean egonkortzeko.
-  \item \textbf{Biraketa itsuan aurrera egitea:} Errepiderik ez denean ($n == 0$), simulazioan geldituta biratzen da ($v=0$). Zoru errealean robota trabatu egiten zen; $v = 0{,}20$~m/s bultzada eta $\omega = -0{,}80$~rad/s ezarri genituen biraketa osatzeko.
-  \item \textbf{Eskuineko babes-eremua:} Beheko koadrantean (\texttt{cv\_image[180:, 160:]}) \%25etik gorako beltzuneak eskuinerako bira blokeatzen du, gurpilak barruko uhartean sartzea saihestuz.
-\end{itemize}
-Zuzengune batean 2775 pixel zuri neurtu genituen; beraz, $n < 4500$ atalase orokorrak zuzenetan ere biraketa itsua aktibatzen zuen, eta $n == 0$ baldintza zorrotza finkatu genuen.
+RKA6 robotarekin, lehenik norabidea nola zuzentzen zuen begiratu genuen. Pista errealean, zoruaren islek eta kameraren bibrazioek errepide gisa hautemandako pixelak aldarazten zituzten. Horregatik, pixel zurien zutabeen mediana erabiltzea erabaki genuen: pixel isolatu batzuek eragin txikiagoa dute erdigunearen kalkuluan. Hasierako probetan robotak alde batera eta bestera gehiegi biratzen zuenez,  = 1{,}5 jaitsi genuen. Horrela, errore beraren aurrean bira txikiagoa egiten zuen eta kulunka murriztu zen.
+
+Bihurgunetik irtetean, robota barruko uhartera gehiegi hurbiltzen zela ikusi genuen. Tarte handiagoa uzteko, erreferentzia 160.~zutabetik 200.era eraman genuen. Errepidea ikusten zuenean, eskuinerako bira ere mugatu genuen ($-0{,}50$~rad/s). Gainera, irudiaren beheko eskuinaldean beltzaren proportzioa \%25etik gorakoa bazen, eskuinerako bira kentzen genion. Horrela, robotak ez zuen barrurantz biratzen jarraitzen. Doikuntza horrekin kanpoko marrara gehiago hurbil daitekeenez, hori ere kontuan hartu genuen.
+
+Banda berdean errepidea galtzean ere bi robotek desberdin erantzuten zuten. Gazebon nahikoa zen lekuan biratzea. RKA6rekin, berriz, bihurgunetik hobeto ateratzen zen eskuinera biratu bitartean poliki aurrera eginez ( = 0{,}20$~m/s eta $\omega = -0{,}80$~rad/s). Maniobra hori noiz hasi erabakitzeko, hasieran 4500 pixeleko atalasea probatu genuen. Zuzen batean 2775 pixel zuri ere neurtu genuenez, atalase horrek bihurgunetik kanpo ere aktiba zezakeen bira. Horregatik, azken kodean banda berdeko azken pixel zuria desagertzean hasten da maniobra (\texttt{n == 0}).
+
 
 \needspace{4\baselineskip}
 \section[Egin 5 saiakera zirkuituan bira osoa emateko, eta kalkulatu arrakasta-ehunekoa][5 saiakerak eta arrakasta-tasa]{Egin 5 saiakera zirkuituan bira osoa emateko, eta kalkulatu arrakasta-ehunekoa}\label{sec:er-saiakerak}
@@ -117,3 +114,5 @@ Lehiaketaren aurretik, RKA6 robotarekin proba-saioa egin genuen bateria kargatua
 \section[Bira bat osatzeko behar den batez besteko denbora neurtu][Bira osatzeko batez besteko denbora]{Bira bat osatzeko behar den batez besteko denbora neurtu}\label{sec:er-denbora}
 
 Bira-denbora kurba baten hasieratik hurrengo biran puntu berera itzuli arte neurtu dugu. Bost saiakeren batez besteko denbora $20{,}82$~s izan da, eta laginaren desbideratze estandarra $0{,}51$~s-koa izan da. Denborarik laburrena $20{,}31$~s-koa izan da (1. saiakeran), eta luzeena $21{,}66$~s-koa (bosgarren saiakeran).
+
+Simulazioan, $0{,}30$~m/s-ko gehieneko abiadurarekin, bost biren batez bestekoa 40 segundo ingurukoa izan zen. RKA6rekin gehieneko abiadura $0{,}60$~m/s-ra igo genuen, eta bost biren batez bestekoa $20{,}82$~s izan zen. Pista errealean bira azkarrago osatzeko, zuzenean azkarrago joateaz gain, bihurgunetik nola ateratzen zen doitu behar izan genuen.
