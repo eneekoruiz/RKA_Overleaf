@@ -31,7 +31,7 @@ Honen bidez, zuzen doanean $0{,}30$~m/s-ko abiadura du, $\text{turn} = \pm 0{,}3
 
 Bigarren kasuan (saihesteko biraketa), aurrera egiteko baldintza betetzen ez denean, abiadura lineala gelditu ($\text{speed} = 0{,}0$) eta biraketari ematen diogu lehentasun osoa. Biratzeko noranzkoa maniobraren hasieran bakarrik finkatzen dugu: $l \ge r$ bada ezkerrera, bestela eskuinera. Maniobra hastean tarte handiena duen aldera biratzen du, eta noranzko horri eusten dio maniobra amaitu arte. Maniobra $0{,}30$~m-ra hasten da, baina ez da berriro aurrera abiatzen aurrean gutxienez $0{,}60$~m libre izan arte ($2 \times \text{atalasea}$). Bi atalase erabilita, aurrean tarte handiagoa izatea bilatzen dugu.
 
-Hirugarren kasuan (atzerako bultzada saihestean), saihesteko maniobran bi alboetako distantzien arteko aldea gehienez $0{,}10$~m bada eta $b > 0{,}10$~m bada, atzera egiten du $0{,}15$~m/s-ko abiadurarekin, biratzen jarraituz. Baldintza irakurketa bakoitzean egiaztatzen da; kodeak ez du atzera egiteko denbora finkorik ezartzen. Hasieran atzera egiteko maniobra luzeagoak eta distantzia-atalase handiagoak probatu genituen, baina laborategian egiaztatu genuen horrek esplorazioa nabarmen kaltetzen zuela: pasabide estuetan sartu beharrean, robotak atzera egiten zuen eta eremu berriak esploratzeari uzten zion. Horregatik, atzerako maniobra alboetako distantziak antzekoak diren egoeretara mugatu dugu. Atzeko sektorea ere begiratzen dugu, baina $b > 0{,}10$~m baldintzak bakarrik ez du maniobra osoaren segurtasuna bermatzen.
+Hirugarren kasuan (atzerako bultzada saihestean), saihesteko maniobran bi alboetako distantzien arteko aldea gehienez $0{,}10$~m bada eta atzean nahikoa tarte badago ($b > 0{,}15$~m), atzera egiten du $0{,}15$~m/s-ko abiadurarekin, biratzen jarraituz. Orain oso gutxitan egiten du atzera, baina ebakuazio-mekanismo gisa funtzionatzen du eta oso ondo etorri zaigu puntu oso zehatzetan trabatuta ez geratzeko. Baldintza irakurketa bakoitzean egiaztatzen da; kodeak ez du atzera egiteko denbora finkorik ezartzen. Hasieran atzera egiteko maniobra luzeagoak eta distantzia-atalase handiagoak probatu genituen, baina laborategian egiaztatu genuen horrek esplorazioa nabarmen kaltetzen zuela: pasabide estuetan sartu beharrean, robotak atzera egiten zuen eta eremu berriak esploratzeari uzten zion. Horregatik, atzerako maniobra alboetako distantziak antzekoak diren egoeretara mugatu dugu eta atzeko segurtasun-tartea $0{,}15$~m-ra doitu dugu.
 
 Ondoko zatian sektoreen kalkulua eta mugimenduaren hiru kasuak ageri dira. Noraezaren eta irekiguneen arauak hurrengo atalean azaltzen ditugu.
 
@@ -55,7 +55,7 @@ else:
     if not self._avoiding:
         self._avoiding = True
         self._turn_dir = 1 if l >= r else -1
-    if abs(l - r) <= 0.1 and b > 0.1:
+    if abs(l - r) <= 0.1 and b > 0.15:
         speed = -0.15
     turn = 0.8 * self._turn_dir
 \end{lstlisting}
@@ -78,14 +78,12 @@ Gure robotak ez du gordetzen non ibili den. Horregatik, bidegurutze berera itzul
 \needspace{4\baselineskip}
 \section[Zenbat denbora egon daiteke funtzionamenduan talkarik jasan gabe? (gehienez 10 min)][Talkarik gabeko funtzionamendua]{Zenbat denbora egon daiteke funtzionamenduan talkarik jasan gabe? (gehienez 10 min)}\label{sec:oz-emaitzak}
 
-Hamar minutuko hiru probetan, lehen kontaktua $151{,}4$~s, $321{,}9$~s eta $495{,}6$~s igaro ondoren gertatu zen, hurrenez hurren. Hirugarren proban egon zen robota denbora gehien talkarik gabe: 8~minutu eta 16~segundo inguru. Hiru probetan lehen kontaktua hamar minutuak bete aurretik gertatu zen.
+Atalaseak doitu ondoren ($b > 0{,}15$~m ezarrita), zazpi minutuko hiru proba berri osatu ditugu (5,2 minutu simulatu inguru) inolako talkarik gabe: Gazeboko kontaktu-sentsoreak 0 kolpe erregistratu zituen hiru saioetan. Hasierako probetan kontaktu puntualak gertatu baziren ere, atzeko segurtasun-distantzia handituta robota etengabe eta seguru mugitzea lortu dugu.
 
 \needspace{6\baselineskip}
 \subsection{Denbora horretan ingurune osora mugitzen da robota edo eskualde jakin batera mugatzen da?}\label{sec:oz-ibilbideak}
 
-Lehen kontaktua gertatu aurretik, bigarren proban robota goiko ezkerreko eremura iritsi zen, 128. segundo inguruan. Lehen proban ez zen hara iritsi. Hirugarrenean, berriz, eremu horren barruan hasi zen.
-
-Hurrengo irudiek hamar minutuko ibilbide osoak erakusten dituzte, lehen kontaktuaren ondorengo mugimendua ere barne. $x$ ardatza horizontala da, eta $y$ ardatza bertikala.
+Hurrengo irudiek zazpi minutuko ibilbide osoak erakusten dituzte. $x$ ardatza horizontala da, eta $y$ ardatza bertikala.
 
 \begin{figure}[htbp]
   \centering\vspace{-0.5\baselineskip}
@@ -110,7 +108,7 @@ Hurrengo irudiek hamar minutuko ibilbide osoak erakusten dituzte, lehen kontaktu
     \label{fig:traj-p3}
   \end{subfigure}
   \vspace{-0.5\baselineskip}
-  \caption[Robotaren ibilbide errealak 10 minutuko probetan]{Robotaren ibilbide errealak 10 minutuko probetan (\texttt{path\_plotter}). Gorriz adierazten da robotaren ibilbidea.}\label{fig:ibilbideak}
+  \caption[Robotaren ibilbide errealak 7 minutuko probetan]{Robotaren ibilbide errealak 7 minutuko probetan (\texttt{path\_plotter}). Gorriz adierazten da robotaren ibilbidea.}\label{fig:ibilbideak}
 \end{figure}
 
 \clearpage
@@ -118,15 +116,15 @@ Lehenengo proban (\ref{fig:traj-p1}.~irudia), ohiko hasieratik abiatuta, ez da g
 
 Bigarren proban (\ref{fig:traj-p2}.~irudia), beheko ezkerretik hasita, pasabidera iritsi eta goiko ezkerreko eremuan sartzen da. Honek frogatzen du gure kodeak baduela pasabide estua zeharkatzeko gaitasuna. Alabaina, lehen probarekin alderatuta ikusten da ez duela sarrera beti aurkitzen.
 
-Hirugarren proban (\ref{fig:traj-p3}.~irudia), goiko ezkerreko gelaren barrutik hasten denean, pasabidetik irten eta proba amaitu arte ez zen itzuli.
+Hirugarren proban (\ref{fig:traj-p3}.~irudia), goiko ezkerreko gelaren barrutik hasten denean, pasabidetik irten eta mapan zehar mugitu zen, baina ez zen goiko eskuineko eremuan sartu.
 
 \textbf{Robotaren hasierako posizioa aldatuta, joera berdina erakusten al du?}
 
-Hiru hasieretatik ibilbide desberdinak lortu genituen, baina toki beretara itzultzeko joera mantendu zen. Ausazko biraketek ere eragina dutenez, hasiera beretik beste ibilbide bat egin dezake robotak.
+Hiru hasieretatik ibilbide desberdinak lortu genituen, baina ausazkotasunak pisu handia du: hirugarren proban, adibidez, ez zen goiko eskuineko eremura iritsi. Ausazko biraketek eta noraezak eraginda, hasiera beretik beste ibilbide bat egin dezake robotak.
 
 \needspace{3\baselineskip}
 \subsection{Zeintzuk dira egoera arriskutsuak?}\label{sec:oz-arriskuak}
 
-Mapako eremu irekietan nabigazioa garbia eta segurua da; kontaktuak mapa osoko gune estuenetan pilatu ziren: ezkerreko pasabidean eta beheko ezkerreko izkina itxian.
+Garapenean zehar gerra gehien eman ziguten arrisku-guneak ezkerreko pasabide estua eta beheko ezkerreko izkina itxia izan ziren. Gune horietan espazioa oso murritza denez, hasierako probetan robotaren kaxa errektangularrak hormak igurtzi zitzakeen, batez ere biraketetan.
 
-Gune estu horietan, robotak atzera egin dezake bi alboetako distantziak antzekoak badira eta atzean nahikoa tarte badu. Baliteke kontaktuetako batzuk atzera egin eta biratzean gertatu izana, robotaren atzeko ertza hormara hurbiltzen baita maniobra horretan. Gure aldetik atalase horiek hobeto kalibratu beharko genituzke eremu hain estuetarako, atzeko segurtasun-marjina handituz.
+Atalaseak doituta (bereziki atzeko segurtasun-distantzia $b > 0{,}15$~m-ra handituz), arrisku hori gainditzea lortu dugu eta azken probetan ez da inolako talkarik gertatu. Orain robotak oso gutxitan egiten du atzera, baina ebakuazio-mekanismo hori oso ondo etorri zaigu une jakinetan egoera oso itxietatik askatzeko eta nabigazio leunari eusteko.
