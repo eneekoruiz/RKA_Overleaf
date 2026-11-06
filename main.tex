@@ -14,13 +14,13 @@
 \renewcommand*{\printchaptername}{\chapnamefont}
 
 %% ---------- AZALEKO DATUAK (bete) ----------
-\newcommand{\egileak}{Eneko Ruiz \\ Eneko Pardavila \\ Omar Ouinas}
+\newcommand{\egileak}{Eneko Ruiz \\[0.4em] Eneko Pardavila \\[0.4em] Omar Ouinas}
 \newcommand{\ikasketak}{Informatika Ingeniaritzako Gradua}
 \newcommand{\irakasgaia}{Robotika eta Kontrol Adimendunak}
 \newcommand{\irakaslea}{Elena Lazkano}
 \newcommand{\izenburua}{Oztopoak ekiditen eta errepideari jarraitzen}
 \newcommand{\azpititulua}{Sentsoreen funtzionamendua lantzen: ROSMASTER X3 robotarekin egindako praktika}
-\newcommand{\data}{\today}
+\newcommand{\data}{2026ko azaroaren 6a}
 
 \input config/makroak
 
@@ -45,9 +45,14 @@
   \tableofcontents
 \end{KeepFromToc}
 \clearpage
+\begingroup
 \listoffigures
-\clearpage
+\vspace{2\baselineskip}
+\let\clearpage\relax
+\let\cleardoublepage\relax
+\let\chapter\section
 \listoftables
+\endgroup
 
 %% ---------- EDUKIA ----------
 \clearpage
@@ -67,11 +72,7 @@
 \input kapituluak/04_ondorioak
 
 \appendix
-\chapter{Proba osagarriak eta materialak}\label{ch:eranskina}
+\chapter{Proba osagarriak}\label{ch:eranskina}
 \input kapituluak/05_eranskina
-
-%% ---------- BIBLIOGRAFIA ----------
-\bibliographystyle{unsrt}
-\bibliography{erreferentziak}
 
 \end{document}

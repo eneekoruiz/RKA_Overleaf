@@ -24,14 +24,31 @@
 \usetikzlibrary{babel}         % TikZ eta babel bateragarri egiteko
 \usepackage{subcaption}        % irudi bat baino gehiago batera: (a), (b)
 \usepackage[font=small,labelfont=bf]{caption}
+\usepackage{float}             % [H] kokapen zorrotza
 \usepackage{listings}          % kodea (minted ez bezala, ez du shell-escape behar)
+\usepackage{enumitem}          % zerrenden tarteak doi kontrolatzeko
+\usepackage{needspace}         % atalak orriaren amaieran bakarrik ez geratzeko
 \usepackage[hyperindex,bookmarks,colorlinks=true,citecolor=blue,urlcolor=blue,linkcolor=blue]{hyperref}
 
 \graphicspath{{irudiak/}}
 \setsecnumdepth{subsection}
 \maxtocdepth{subsection}
+\nouppercaseheads
 \setlength{\parskip}{5pt}
 \setlength{\emergencystretch}{3em}   % kode-izen luzeek lerroa ez gainditzeko
+
+%% Orri-jauzien eta umezurtzen (widows/orphans) kontrol zorrotza
+\widowpenalty=10000
+\clubpenalty=10000
+\displaywidowpenalty=10000
+\brokenpenalty=10000
+\raggedbottom
+
+%% Elementu mugikorren (flotanteen) doikuntzak
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.15}
+\renewcommand{\floatpagefraction}{0.7}
 
 %% Oinen formatua euskaraz: "2.1. irudia", "3.1. taula", "3.1. kode-zatia"
 \DeclareCaptionLabelFormat{euskaraz}{#2.~#1}

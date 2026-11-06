@@ -165,6 +165,7 @@ def clean_latex(text: str) -> str:
     t = t.replace(r'^\circ', '°')
     t = t.replace(r'\circ', '°')
     t = t.replace(r'\tabcolsep', '')
+    t = t.replace('--', '–')
 
     # Strip inline $ math delimiters
     t = t.replace('$', '')
@@ -495,15 +496,35 @@ def parse_chapter_content(doc, content: str):
             continue
 
         # Headings
-        if line.startswith(r'\section{'):
-            inner, _ = extract_braced(line, len(r'\section'))
-            doc.add_heading(clean_latex(inner), level=2)
+        if line.startswith(r'\section{') or line.startswith(r'\section['):
+            pos = len(r'\section')
+            while pos < len(line) and line[pos] == '[':
+                cb = line.find(']', pos)
+                if cb != -1:
+                    pos = cb + 1
+                else:
+                    break
+            if pos < len(line) and line[pos] == '{':
+                inner, _ = extract_braced(line, pos)
+                doc.add_heading(clean_latex(inner), level=2)
+            else:
+                doc.add_heading(clean_latex(line), level=2)
             i += 1
             continue
 
-        if line.startswith(r'\subsection{'):
-            inner, _ = extract_braced(line, len(r'\subsection'))
-            doc.add_heading(clean_latex(inner), level=3)
+        if line.startswith(r'\subsection{') or line.startswith(r'\subsection['):
+            pos = len(r'\subsection')
+            while pos < len(line) and line[pos] == '[':
+                cb = line.find(']', pos)
+                if cb != -1:
+                    pos = cb + 1
+                else:
+                    break
+            if pos < len(line) and line[pos] == '{':
+                inner, _ = extract_braced(line, pos)
+                doc.add_heading(clean_latex(inner), level=3)
+            else:
+                doc.add_heading(clean_latex(line), level=3)
             i += 1
             continue
 
@@ -537,10 +558,11 @@ def parse_chapter_content(doc, content: str):
             continue
 
         # Equations
-        if line.startswith("\\begin{equation}"):
+        if line.startswith(r"\begin{equation}") or line == r"\[":
+            end_tag = r"\end{equation}" if "equation" in line else r"\]"
             eq_lines = []
             i += 1
-            while i < len(lines) and not lines[i].strip().startswith("\\end{equation}"):
+            while i < len(lines) and not lines[i].strip().startswith(end_tag):
                 eq_lines.append(lines[i].strip())
                 i += 1
             i += 1
@@ -569,12 +591,20 @@ def parse_chapter_content(doc, content: str):
             i += 1
             continue
 
-        if line in (
-            "\\begin{itemize}", "\\end{itemize}",
-            "\\begin{enumerate}", "\\end{enumerate}",
-            "\\begin{description}", "\\end{description}",
-            "\\begin{figure}", "\\end{figure}",
-            "\\centering", "\\clearpage", "\\hfill"
+        # Skip formatting and layout directives
+        if (
+            line.startswith(r"\needspace")
+            or line.startswith(r"\clearpage")
+            or line.startswith(r"\vspace")
+            or line.startswith(r"\begin{itemize}")
+            or line.startswith(r"\end{itemize}")
+            or line.startswith(r"\begin{enumerate}")
+            or line.startswith(r"\end{enumerate}")
+            or line.startswith(r"\begin{description}")
+            or line.startswith(r"\end{description}")
+            or line.startswith(r"\begin{figure}")
+            or line.startswith(r"\end{figure}")
+            or line in (r"\centering", r"\hfill", r"\begingroup", r"\endgroup", r"\]")
         ):
             i += 1
             continue

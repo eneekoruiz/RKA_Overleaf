@@ -19,3 +19,11 @@ cookies.txt
 *.toc
 *.lof
 *.lot
+
+# Temporary artifacts & renders
+ol_page_*.png
+*.pdf
+debug_*.txt
+pdf_pages_dump.txt
+__pycache__/
+*.pyc
