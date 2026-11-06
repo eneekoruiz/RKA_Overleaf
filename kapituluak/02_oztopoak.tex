@@ -2,7 +2,13 @@
 
 Gure helburua robotak oztopoak jo gabe eta modu leunean nabigatzea da. Horretarako erabili dugun portaera honakoa izan da: ez dugu maparik eraikitzen eta ez dugu bisitatutako lekuen memoriarik gordetzen; uneko distantziei soilik erreparatzen diegu.
 
-LiDARraren 360°-ko neurketak erabiliz, lau sektore nagusi bereizten ditugu robotaren erreferentzia-sistemaren arabera. Aurreko sektoreak ($f$) $-30^\circ$-tik $+30^\circ$-ra bitarteko eremua hartzen du ($60^\circ$) eta aurrerako bidea libre dagoen aztertzen du. Eskuineko ($r$, $-90^\circ$-tik $-30^\circ$-ra) eta ezkerreko ($l$, $+30^\circ$-tik $+90^\circ$-ra) sektoreek aldamenetako hormak kontrolatu eta biratzeko tarte handiena zein den alderatzeko balio dute. Azkenik, atzeko sektoreak ($b$) $+150^\circ$-tik $+180^\circ$-ra eta $-180^\circ$-tik $-150^\circ$-ra arteko eremua estaltzen du ($b_1 + b_2$ zerrenda-zatiak batuz), atzerako maniobren segurtasuna egiaztatzeko.
+LiDARraren 360°-ko neurketak erabiliz, lau sektore nagusi bereizten ditugu robotaren erreferentzia-sistemaren arabera:
+\begin{itemize}[noitemsep,topsep=2pt]
+  \item \textbf{Aurrea ($f$):} $-30^\circ$-tik $+30^\circ$-ra bitarteko eremua ($60^\circ$). Aurrerako bidea libre dagoen aztertzen du.
+  \item \textbf{Eskuina ($r$):} $-90^\circ$-tik $-30^\circ$-ra ($60^\circ$). Eskuineko hormak kontrolatu eta biratzeko tartea alderatzeko balio du.
+  \item \textbf{Ezkerra ($l$):} $+30^\circ$-tik $+90^\circ$-ra ($60^\circ$). Ezkerreko hormak kontrolatu eta biratzeko tartea alderatzeko erabiltzen da.
+  \item \textbf{Atzea ($b$):} $+150^\circ$-tik $+180^\circ$-ra eta $-180^\circ$-tik $-150^\circ$-ra ($b_1 + b_2$ zerrenda-zatiak batuz). Atzerako maniobren segurtasuna egiaztatzeko.
+\end{itemize}
 
 Aurrean $\pm 30^\circ$ hartzearen arrazoia aurreko bidea eta haren ingurua aztertzea da. Sektorea askoz zabalagoa balitz, alboko hormek aurreko bidea itxita dagoela pentsaraz lezakete. Horregatik, alboak bereizteko beharra dago: aurreko distantziak aurrera egin dezakegun esaten digu, eta albokoek nora biratu.
 
