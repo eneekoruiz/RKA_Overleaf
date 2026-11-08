@@ -4,7 +4,7 @@ Bigarren ariketan, robotak kameraren bidez \texttt{yahboom\_track} zirkuituari j
 
 Lehenengoa aurrerapen-banda nagusia da (berdez markatua), 100--179 errenkaden arteko tartea hartzen duena zabalera osoan (\texttt{cv\_image[100:180, :]}). 100. errenkadatik gora hormak eta urruneko bidea daude, eta tarte hori sartuz gero kurbak goizegi detektatzen ziren. 180. errenkadatik behera, berriz, robotaren aurre-aurreko zorua dago; eremu hori ia beti zuriz beteta dago eta ez du norabideari buruzko informazio erabilgarririk ematen. Tarte berde honetan errepideko pixel zurien zutabeen mediana kalkulatzen dugu (\texttt{np.median(zutabeak)}), batezbestekoa baino askoz sendoagoa delako zarata eta balio isolatuen aurrean.
 
-Bigarrena gertuko eskuin-eremua da (gorriz mugatua), 180--239 errenkadak eta 160--319 zutabeak biltzen dituena (\texttt{cv\_image[180:, 160:]}). Eremu honetan ez da mediana kalkulatzen: errepidea ez den azaleraren proportzioa neurtzen da (eremu beltza). Beltzaren proportzioak \%25 gainditzen badu, eskuinerako bira mugatzen dugu, beltz hori barruko uharte debekatua, kanpoko horma edo segmentazio-akats bat izan daitekeelako.
+Bigarrena gertuko eskuin-eremua da (gorriz mugatua), 180--239 errenkadak eta 160--319 zutabeak biltzen dituena (\texttt{cv\_image[180:, 160:]}). Eremu honetan ez da mediana kalkulatzen: errepidea ez den azaleraren proportzioa neurtzen da (eremu beltza). Beltzaren proportzioak \%25 gainditzen badu, eskuinerako bira mugatzen dugu.
 
 \begin{figure}[H]
   \centering
@@ -12,7 +12,7 @@ Bigarrena gertuko eskuin-eremua da (gorriz mugatua), 180--239 errenkadak eta 160
   \caption[Kameraren irudiak eta segmentazioa]{Kameraren benetako irudiak (goian) eta segmentazioa (azpian) hiru unetan: zuzenetan, kurbetan eta kurbaren bukaeran. Laukizuzen berdea aurrerapen-banda da (100--179 errenkadak) eta gorria eskuineko babes-eremua.}\label{fig:kamera-segmentazioa}
 \end{figure}
 
-Ezkerreko irudian errepidea banda berdean ikusten da eta zuzenketa txikia agintzen da. Erdikoan banda beltz dago eta errepiderik gabeko adarra aktibatzen da. Eskuinekoan errepidea berriro agertzen da eta medianaren araberako kontrolera itzultzen da.
+Ezkerreko irudian errepidea banda berdean ikusten da eta zuzenketa txikia agintzen da. Erdikoan banda beltz dago eta biraketa itsuko kasua aktibatzen da. Eskuinekoan errepidea berriro agertzen da eta medianaren araberako kontrolera itzultzen da.
 
 \needspace{6\baselineskip}
 \section[Abiaduren kontrola eta kasuen banaketa][Abiaduren kontrola eta kasuak]{Abiaduren kontrola eta kasuen banaketa}\label{sec:er-abiadurak}
@@ -101,7 +101,7 @@ twist_msg.angular.z = np.clip(angular_velocity, -0.5, 0.5)
 \section[Abiadurak doitu ingurune errealean ere funtzionatzeko][Ingurune errealeko doikuntzak]{Abiadurak doitu ingurune errealean ere funtzionatzeko}\label{sec:er-doikuntzak}
 
 Pista errealeko azken bertsioaren (\ref{lst:road}.~kode-zatia) eta simulazioko kodearen (\ref{lst:road-sim}.~kode-zatia) artean aldaketa sakonak egin behar izan genituen errealitate fisikora egokitzeko:
-RKA36 robotarekin, lehenik norabidea nola zuzentzen zuen begiratu genuen. Pista errealean, zoruaren islek eta kameraren bibrazioek errepide gisa hautemandako pixelak aldarazten zituzten. Horregatik, pixel zurien zutabeen mediana erabiltzea erabaki genuen: pixel isolatu batzuek eragin txikiagoa dute erdigunearen kalkuluan. Hasierako probetan robotak alde batera eta bestera gehiegi biratzen zuenez, $K = 1{,}5$-era jaitsi genuen. Horrela, errore beraren aurrean bira txikiagoa egiten zuen eta mugimendua leunagoa zen.
+RKA36 robotarekin, lehenik norabidea nola zuzentzen zuen begiratu genuen. Pista errealean, zoruaren islek eta kameraren bibrazioek errepide gisa hautemandako pixelak aldarazten zituzten. Horregatik, pixel zurien zutabeen mediana erabiltzea erabaki genuen: pixel isolatu batzuek eragin txikiagoa dute erdigunearen kalkuluan. Hasierako probetan robotak zig-zag gehiegi egiten zuenez, $K$ jeitsiz joan ginan $K = 1{,}5$-era iritsi arte, puntua errealitatean aurkitutako oreka sendoena baitzen. Horrela, errore beraren aurrean bira txikiagoa egiten zuen eta mugimendua leunagoa zen.
 
 Kurbetatik irtetean, robota barruko uhartera gehiegi hurbiltzen zela ikusi genuen. Tarte handiagoa uzteko, erreferentzia 160.~zutabetik 200.era eraman genuen. Errepidea ikusten zuenean, eskuinerako bira ere mugatu genuen ($-0{,}50$~rad/s). Gainera, irudiaren beheko eskuinaldean beltzaren proportzioa \%25etik gorakoa bazen, eskuinerako bira kentzen genion. Horrela, robotak ez zuen barrurantz biratzen jarraitzen. Doikuntza horrekin kanpoko marrara gehiago hurbil daitekeenez, hori ere kontuan hartu genuen.
 
@@ -111,7 +111,7 @@ Banda berdean errepidea galtzean ere bi robotek desberdin erantzuten zuten. Gaze
 \needspace{6\baselineskip}
 \section[Egin 5 saiakera zirkuituan bira osoa emateko, eta kalkulatu arrakasta-ehunekoa][5 saiakerak eta arrakasta-tasa]{Egin 5 saiakera zirkuituan bira osoa emateko, eta kalkulatu arrakasta-ehunekoa}\label{sec:er-saiakerak}
 
-Lehiaketaren aurreko egunean, RKA36 robotarekin proba-saioa egin genuen bateria kargatuarekin eta pista librean. Bost saiakeretan zirkuituaren bira osoa osatzea lortu genuen, eta bosgarren saiakeraren eskuzko berrikuspena egin ondoren, arrakasta-tasa $5/5 = \%100$ izan zen (\ref{tab:road-5saiakera}.~taula).
+Lehiaketaren aurreko egunean, RKA36 robotarekin proba-saioa egin genuen bateria kargatuarekin eta pista librean. Bost saiakeretan zirkuituaren bira osoa osatzea lortu genuen, eta bosgarren saiakeraren eskuzko berrikuspena egin ondoren, arrakasta-tasa \%100ekoa (5/5) izan zen (\ref{tab:road-5saiakera}.~taula).
 
 \begin{table}[H]
   \centering\small
@@ -126,7 +126,7 @@ Lehiaketaren aurreko egunean, RKA36 robotarekin proba-saioa egin genuen bateria 
     5* & 21{,}66~s & 0{,}427 \\
     \bottomrule
   \end{tabularx}
-  \caption[Robot errealean egindako 5 saiakeren emaitzak]{Robot errealean egindako 5 saiakeren emaitzak. *~5. saiakeran detektagailu automatikoak marra hori 1 markatu zuen, baina eskuzko ikuskapenak frogatu zuen kanpoko hormaren oineko marra zela eta ez barruko uharte debekatua.}\label{tab:road-5saiakera}
+  \caption[Robot errealean egindako 5 saiakeren emaitzak]{Robot errealean egindako 5 saiakeren emaitzak. *~5. saiakeran marra hori 1 markatu zen, baina eskuzko ikuskapenak frogatu zuen kanpoko hormaren oineko marra zela eta ez barruko uharte debekatua.}\label{tab:road-5saiakera}
 \end{table}
 
 \needspace{3\baselineskip}
