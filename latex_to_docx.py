@@ -708,7 +708,7 @@ def build_document():
         parse_chapter_content(doc, content)
 
     # Save to both local destinations
-    for loc_p in [LOCAL_DOCX_PARALLEL, LOCAL_DOCX_MAIN]:
+    for loc_p in [LOCAL_DOCX_PARALLEL]:
         if loc_p.exists():
             try:
                 loc_p.unlink()
@@ -719,7 +719,7 @@ def build_document():
 
     # Save to Google Drive
     if DRIVE_DIR.exists():
-        for drive_p in [OUTPUT_DOCX_PARALLEL, OUTPUT_DOCX_MAIN]:
+        for drive_p in [OUTPUT_DOCX_PARALLEL]:
             try:
                 if drive_p.exists():
                     drive_p.unlink()

@@ -17,15 +17,15 @@ Ezkerreko irudian errepidea banda berdean ikusten da eta zuzenketa txikia agintz
 \needspace{6\baselineskip}
 \section[Abiaduren kontrola eta kasuen banaketa][Abiaduren kontrola eta kasuak]{Abiaduren kontrola eta kasuen banaketa}\label{sec:er-abiadurak}
 
-Zirkuitua erlojuaren noranzkoan denez, kurba guztiak eskuinera dira. Gure kontrol-legeak hiru kasu bereizten ditu:
+Zirkuitua erlojuaren noranzkoan denez, kurba guztiak eskuinera dira. Gure kodeak hiru kasu bereizten ditu:
 
-Lehenengo kasuan (biraketa itsua, $n == 0$), kurba itxi baten erdian robotak horma besterik ez du ikusten aurrean, eta bandan ez da pixel zuririk agertzen. Egoera honetan abiadura lineala $v = 0{,}20$~m/s-ra murrizten dugu eta eskuinera indartsu biratzen dugu: $\omega = -0{,}80$~rad/s. Zirkuituko bira guztiak eskuinera direnez, biraketa horrekin errepidea berriro kameraren bistan sartzea bilatzen dugu. $n == 0$ egoera segmentazioak huts egitean ere ager daiteke.
+Lehenengo kasuan (biraketa itsua, $n == 0$), kurba itxi baten erdian robotak horma besterik ez du ikusten aurrean, eta bandan ez da pixel zuririk agertzen. Egoera honetan abiadura lineala $v = 0{,}20$~m/s-ra murrizten dugu eta eskuinera indartsu biratzen dugu: $\omega = -0{,}80$~rad/s. Zirkuituko bira guztiak eskuinera direnez, biraketa horrekin errepidea berriro kameraren bistan sartzea bilatzen dugu.
 
 Bigarren kasuan (errepidea ikusten denean, $n > 0$), errore normalizatua kalkulatzen dugu:
 \[
-  e = \frac{\text{erdigunea} - 200}{160}
+  e = \frac{\text{erdigunea} - (160 + 40)}{160} = \frac{\text{erdigunea} - 200}{160}
 \]
-Erreferentzia ez dugu erdi-erdian jarri (160), 200. zutabean baizik (+40 pixeleko desplazamendua). Horrela robotak mediana eskuinerago mantentzen du eta bere ibilbidea kanpoaldetik lerratzen du, barruko uharte debekatutik urrun mantenduz. Biraketa-abiadura eta abiadura lineala errorearen arabera erregulatzen ditugu:
+Erreferentzia ez dugu irudiaren erdian jarri (160), $+40$ pixeleko kanpo-desplazamendua gehituta 200. zutabean baizik: \texttt{erdigunea - (image\_width / 2 + 40)}. Horrela robotak mediana eskuinerago mantentzen du eta bere ibilbidea kanpoaldetik lerratzen du, barruko uharte debekatutik urrun mantenduz. Biraketa-abiadura eta abiadura lineala errorearen arabera erregulatzen ditugu:
 \[
   \omega = \max(-1{,}5 \cdot e,\, -0{,}50), \qquad v = 0{,}6 \cdot (1 - 0{,}7 \cdot |e|)
 \]
@@ -46,7 +46,7 @@ else:
     # 3b. Errepidearen erdigunea (mediana)
     erdigunea = np.median(zutabeak)
     # 4. Errorea: kanpo-lerratzea (+40 px)
-    error = (erdigunea - 200) / 160
+    error = (erdigunea - (160 + 40)) / 160
     # 5. Kontrol proportzionala (muga: -0.5)
     angular_velocity = max(-1.5 * error, -0.5)
     # 6. Abiadura lineala (moteldu kurban)
@@ -63,9 +63,9 @@ twist_msg.angular.z = np.clip(angular_velocity, -0.8, 0.8)
 \needspace{4\baselineskip}
 \section[Erabili simulazioa portaera garatu eta ebaluatzeko][Simulazioaren bidezko ebaluazioa]{Erabili simulazioa portaera garatu eta ebaluatzeko}\label{sec:er-simulazioa}
 
-Robot errealean probatu aurretik, kontrol-parametroak Gazeboko \texttt{yahboom\_track} zirkuituan ebaluatu genituen (\ref{fig:sim-zirkuitua}.~irudia). Hasierako S1 eta S2 probetan robot errealeko kodea erabili genuen: $V_{\max} = 0{,}60$~m/s-rekin (S1) robotak 7 kontaktu izan zituen kanpoko hormaren kontra trabatu arte; $0{,}30$~m/s-ra jaitsita (S2), bira ia osoa egin arren (120~s), 14 kontaktu jaso zituen. Talka horiek robot errealerako diseinatutako +40 pixeleko kanpo-desplazamenduak eta biraketa asimetrikoek eragin zituzten Gazeboko horma estuetan.
+Lan-estrategiari jarraituz, simulazioko bertsio garbia garatu genuen lehenik (\ref{lst:road-sim}.~kode-zatia, \texttt{road\_following.py}). Gazeboko ingurune idealean zoru-islarik ez dagoenez, bidearen erdigunea zorrotz jarraitzen da (\texttt{np.mean}) $K = 5{,}0$ irabaziarekin, eta biraketa itsuan ($n == 0$) robota gelditu egiten da ($v = 0{,}0$~m/s, $\omega = -0{,}5$~rad/s). Kode honekin simulazioko emaitza \textbf{bikaina da: 0 talka eta bira perfektuak}, batez besteko bira-denbora $\approx 40$~s izanik ($V_{\max} = 0{,}30$~m/s denez).
 
-Simulagailurako bertsio garbi bat garatu genuen (\texttt{road\_following.py}, \ref{lst:road-sim}.~kode-zatia): zoru-islarik ez dagoenez, bidearen erdigunea zorrotz jarraitzen da (\texttt{np.mean}) $K = 5{,}0$ irabaziarekin, eta biraketa itsuan ($n == 0$) robota gelditu egiten da ($v = 0{,}0$~m/s, $\omega = -0{,}5$~rad/s). Kode honekin simulazioko emaitza \textbf{bikaina da: 0 talka eta bira perfektuak}, batez besteko bira-denbora $\approx 40$~s izanik ($V_{\max} = 0{,}30$~m/s denez).
+Ondoren, robot errealean probak egin eta parametroak doitu genituen laborategian. Geroago, robot errealeko kode hura berriro Gazebon ebaluatu genuenean (S1 eta S2 probak, \ref{fig:sim-zirkuitua}.~irudia), kontaktu ugari erregistratu zituen: $V_{\max} = 0{,}60$~m/s-rekin (S1) 7 kontaktu horman trabatu arte, eta $0{,}30$~m/s-ra (S2) 14 kontaktu. Hasieran ez ginen guztiz jabetzen pista errealean egindako doikuntzek (batez ere $+40$ pixeleko kanpo-desplazamenduak eta biraketa asimetrikoak) zeinen eragin handia zuten Gazeboko horma estuetan. Esperimentu horrek argi erakutsi zigun simulatutako mundu idealaren eta errealitate fisikoaren artean dagoen tarte handia.
 
 \begin{figure}[H]
   \centering
