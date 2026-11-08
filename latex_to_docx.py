@@ -18,6 +18,11 @@ LOCAL_DOCX_PARALLEL = BASE_DIR / "Praktika_Txostena_RKA_berrikusia.docx"
 LOCAL_DOCX_MAIN = BASE_DIR / "Praktika_Txostena_RKA.docx"
 
 REFS = {
+    "ch:sarrera": "1",
+    "ch:oztopoak": "2",
+    "ch:errepidea": "3",
+    "ch:ondorioak": "4",
+    "ch:eranskina": "5",
     "fig:ibilbideak": "1",
     "fig:traj-p1": "1a",
     "fig:traj-p2": "1b",
@@ -27,11 +32,12 @@ REFS = {
     "fig:abiadurak-telemetria": "4",
     "tab:rwander-10min": "1",
     "tab:rwander-5min": "1",
-    "tab:sim-emaitzak": "2",
-    "tab:road-5saiakera": "2",
-    "tab:rwander-extra": "4",
+    "tab:sim-emaitzak": "1",
+    "tab:road-5saiakera": "1",
+    "tab:rwander-extra": "1",
     "lst:rwander": "1",
     "lst:road": "2",
+    "lst:road-sim": "3",
     "sec:oz-sektoreak": "2.1",
     "sec:oz-mugimendua": "2.2",
     "sec:oz-esplorazioa": "2.3",
@@ -54,6 +60,7 @@ CITES = {
 
 table_counter = 0
 fig_counter = 0
+code_counter = 0
 
 
 def set_cell_background(cell, fill_hex):
@@ -178,7 +185,21 @@ def clean_latex(text: str) -> str:
     return t.strip()
 
 
-def add_code_block(doc, code_text):
+def add_code_block(doc, code_text, caption=""):
+    global code_counter
+    code_counter += 1
+    if caption:
+        p_cap = doc.add_paragraph()
+        p_cap.paragraph_format.space_before = Pt(8)
+        p_cap.paragraph_format.space_after = Pt(2)
+        p_cap.paragraph_format.keep_with_next = True
+        r_lbl = p_cap.add_run(f"{code_counter}. kode-zatia: ")
+        r_lbl.bold = True
+        r_lbl.font.size = Pt(9.5)
+        r_lbl.font.color.rgb = RGBColor(30, 41, 59)
+        r_txt = p_cap.add_run(caption)
+        r_txt.font.size = Pt(9.5)
+        r_txt.font.color.rgb = RGBColor(71, 85, 105)
     tbl = doc.add_table(rows=1, cols=1)
     tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
     cell = tbl.cell(0, 0)
@@ -446,11 +467,17 @@ def parse_chapter_content(doc, content: str):
         if "\\begin{lstlisting}" in line:
             in_code = True
             code_lines = []
+            if "caption={" in line:
+                pos = line.find("caption={")
+                raw_c, _ = extract_braced(line, pos + len("caption={") - 1)
+                current_code_caption = clean_latex(raw_c)
+            else:
+                current_code_caption = ""
             i += 1
             continue
         elif "\\end{lstlisting}" in line:
             in_code = False
-            add_code_block(doc, "\n".join(code_lines))
+            add_code_block(doc, "\n".join(code_lines), current_code_caption)
             i += 1
             continue
         elif in_code:
@@ -633,9 +660,10 @@ def add_xml_field(para, field_name):
 
 
 def build_document():
-    global table_counter, fig_counter
+    global table_counter, fig_counter, code_counter
     table_counter = 0
     fig_counter = 0
+    code_counter = 0
 
     doc = Document()
 
@@ -648,15 +676,7 @@ def build_document():
 
         footer = section.footer
         p_ftr = footer.paragraphs[0]
-        p_ftr.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-        r_txt = p_ftr.add_run("Orria ")
-        r_txt.font.size = Pt(9)
-        r_txt.font.color.rgb = RGBColor(100, 116, 139)
-        add_xml_field(p_ftr, "PAGE")
-        r_sep = p_ftr.add_run(" / ")
-        r_sep.font.size = Pt(9)
-        r_sep.font.color.rgb = RGBColor(100, 116, 139)
-        add_xml_field(p_ftr, "NUMPAGES")
+        p_ftr.text = ""
 
     # Title
     p_title = doc.add_paragraph()

@@ -16,7 +16,7 @@ Klasean aurrea, ezkerra eta eskuina bereiztea landu genuen. Atzeko sektorea gure
 
 Sektore bakoitzeko distantziak ordenatu eta bosgarren txikiena hartzen dugu, \texttt{sorted(...)[4]} erabiliz. Bosgarren baliorik txikiena hartuta, neurketa baxu isolatu batek eragin txikiagoa du. Hala ere, oztopo estu bat izpi gutxitan agertzen bada, iragazkiak haren neurketak bazter ditzake; beraz, baditu bere mugak.
 
-$0{,}30$~m aukeratu genuen hormari erantzuteko tartea uzteko eta pasabide estuetan sartzeko aukera mantentzeko.
+Segurtasun-atalasea 0,30~m-tan jarri genuen: gehieneko abiaduran (0,30~m/s) robotari denbora ematen dio hormaren aurrean gelditzeko, baina aldi berean tarte nahikoa uzten dio pasabide estuetan sartzeko.
 
 \needspace{6\baselineskip}
 \section[Nola egokitu dituzu abiadurak egoera desberdinetan?][Abiaduren eta biraketen egokitzapena]{Nola egokitu dituzu abiadurak, bai lineala, bai biraketa-abiadura, egoera desberdinetan?}\label{sec:oz-mugimendua}
@@ -76,14 +76,14 @@ Alde batetik, mugimenduari noraeza (\emph{deriba}) aplikatzen diogu. Honen bidez
 \]
 Biraketa berria kalkulatzeko, aurreko balioaren \%90 hartu eta ausazko balio txiki bat gehitzen diogu. Horrela, norabidea pixkanaka alda daiteke.
 
-Beste aldetik, alboko irekiguneetara biratzea ($90^\circ$-ko izpia) erabili dugu hormen inguruko sarrerak detektatzeko. Alboko $90^\circ$-ko izpiaren neurketa eta sektore bereko distantzia konparatzen dira: $90^\circ$-ko izpiak $1{,}50$~m-ko distantzia gainditzen duenean eta alboko sektorea $0{,}90$~m baino gutxiagora dagoenean, irekigune bat dagoela ondorioztatzen da. Kontrol-begizta maiztasun handiz exekutatzen denez, irekigune bat ikustean beti biratuko balu bertan trabatuta gera liteke; horregatik, egiaztapen bakoitzean \%3ko probabilitate txiki bat ezarri genuen (\texttt{random.random() < 0.03}) irekigunerantz biratzeko ($\text{turn} = \pm 1{,}2$~rad/s). Horrela, sarreraren ondotik igarotzean tarteka bertan sartzen da eremu berriak esploratzeko, baina beste batzuetan aurrera jarraitzen du bide nagusitik. Ebaluazio hau alboko hormetatik nahikoa urrun dagoenean soilik egiten da.
+Beste aldetik, alboko irekiguneetara biratzea ($90^\circ$-ko izpia) erabili dugu hormen inguruko sarrerak detektatzeko. Irekigune bat bilatzeko, bi baldintza begiratzen ditugu aldi berean: alboko horma $0{,}30$~m eta $0{,}90$~m artean egotea (ondoan joateko baina ukitu gabe), eta une jakin batean $90^\circ$-ko izpiak bat-batean $1{,}50$~m baino gehiago neurtzea, ate edo pasabide ireki bat dagoela adieraziz. Kontrol-begizta maiztasun handiz exekutatzen denez, irekigune bat ikustean beti biratuko balu bertan trabatuta gera liteke; horregatik, egiaztapen bakoitzean \%3ko probabilitate txiki bat ezarri genuen (\texttt{random.random() < 0.03}) irekigunerantz biratzeko ($\text{turn} = \pm 1{,}2$~rad/s). Horrela, sarreraren ondotik igarotzean tarteka bertan sartzen da eremu berriak esploratzeko, baina beste batzuetan aurrera jarraitzen du bide nagusitik.
 
 Gure robotak ez du gordetzen non ibili den. Horregatik, txoko edo bidegurutze berera itzultzen denean, ezin du jakin zein bide geratzen zaion bisitatzeko. Alabaina, ausazko biraketek beste bide bat hartzeko aukera ematen diote.
 
 \needspace{4\baselineskip}
 \section[Zenbat denbora egon daiteke funtzionamenduan talkarik jasan gabe? (gehienez 10 min)][Talkarik gabeko funtzionamendua]{Zenbat denbora egon daiteke funtzionamenduan talkarik jasan gabe? (gehienez 10 min)}\label{sec:oz-emaitzak}
 
-Azken bertsioa ebaluatzeko, zazpi minutuko hiru proba egin genituen Gazebon, bakoitza hasierako posizio batetik. Hiru probetan robotak zazpi minutuak osatu zituen, eta kontaktu-sentsoreak ez zuen gorputz-kontakturik erregistratu.
+Robotak arazorik gabe gainditzen ditu jarraian eskatutako 10 minutuak talkarik jasan gabe. Hala ere, ibilbideen irudietarako zazpi minutuko hiru proba erregistratu genituen, marrazkian lerroak gehiegi ez pilatzeko eta ibilbidea garbi ikusteko. Hiru probetan robotak denbora osoa bete zuen eta kontaktu-sentsoreak ez zuen talkarik erregistratu.
 
 \needspace{6\baselineskip}
 \subsection{Denbora horretan ingurune osora mugitzen da robota edo eskualde jakin batera mugatzen da?}\label{sec:oz-ibilbideak}
@@ -126,4 +126,4 @@ Hiru probetan toki batetik bestera mugitu zen, baina ez zituen beti eremu berak 
 \needspace{3\baselineskip}
 \subsection{Zeintzuk dira egoera arriskutsuak?}\label{sec:oz-arriskuak}
 
-Garapenean zehar arrisku-gune nagusiak ezkerreko pasabide estua eta beheko ezkerreko izkina itxia izan ziren. Gune horietan robotak hormak igurtzi zitzakeen biraketetan.
+Robotaren neurriek bi egoera arriskutsu sortzen dituzte batez ere. Alde batetik, pasabide estuetan hormak oso gertu daude eta alde batera eta bestera gehiegi biratzeko arriskua dago. Bestetik, txoko itxietan biratzeko leku gutxi dagoenez, horma ukitzeko arriskua dago. Horregatik, txoko horietatik irteteko atzera apur bat egitea erabaki genuen (-0,15~m/s), leku gehiagorekin eta seguruago maniobratzeko.
