@@ -35,17 +35,27 @@ Hirugarren kasuan (barruko uhartearen babesa), bigarren kasuaren barruan, beheko
 
 \needspace{6\baselineskip}
 \begin{lstlisting}[caption={Errepide-jarraipenaren logika nagusia robot errealean (\texttt{road\_following\_final.py}).},label={lst:road}]
+# 1. Aurrerapen-banda eta 2. errepideko pixelak
 zatia = cv_image[100:180, :]
 errenkadak, zutabeak = np.nonzero(zatia > 127)
+
 if len(zutabeak) == 0:
+    # 3a. Errepiderik ez: bihurgune itsuan biratu
     linear_velocity = 0.2; angular_velocity = -0.8
 else:
+    # 3b. Errepidearen erdigunea (mediana)
     erdigunea = np.median(zutabeak)
+    # 4. Errorea: kanpo-lerratzea (+40 px)
     error = (erdigunea - 200) / 160
+    # 5. Kontrol proportzionala (muga: -0.5)
     angular_velocity = max(-1.5 * error, -0.5)
+    # 6. Abiadura lineala (moteldu kurban)
     linear_velocity = 0.6 * (1 - 0.7 * abs(error))
+    # 7. Babesa: uhartea gertu bada, bira kendu
     if (cv_image[180:, 160:] < 128).mean() > 0.25:
         angular_velocity = max(angular_velocity, 0.0)
+
+# Abiadura-aginduak argitaratu (seguruak)
 twist_msg.linear.x = min(linear_velocity, 0.6)
 twist_msg.angular.z = np.clip(angular_velocity, -0.8, 0.8)
 \end{lstlisting}
@@ -59,26 +69,35 @@ Simulagailurako bertsio garbi bat garatu genuen (\texttt{road\_following.py}, \r
 
 \begin{figure}[H]
   \centering
-  \includegraphics[height=5.6cm,keepaspectratio]{sim_zirkuitua_goitik.png}
+  \includegraphics[height=4.0cm,keepaspectratio]{sim_zirkuitua_goitik.png}
   \caption[Gazeboko yahboom\_track zirkuitua]{Gazeboko \texttt{yahboom\_track} zirkuitua goitik ikusita.}\label{fig:sim-zirkuitua}
 \end{figure}
 
 \needspace{6\baselineskip}
 \begin{lstlisting}[caption={Simulagailurako bertsio garbiaren logika (\texttt{road\_following.py}).},label={lst:road-sim}]
+# 1. Aurrerapen-banda eta 2. errepideko pixelak
 zatia = cv_image[100:180, :]
 errenkadak, zutabeak = np.nonzero(zatia > 127)
+
 if len(zutabeak) == 0:
+    # 3a. Errepiderik ez: gelditu eta biratu
     linear_velocity = 0.0; angular_velocity = -0.5
 else:
+    # 3b. Errepidearen batez bestekoa
     erdigunea = np.mean(zutabeak)
+    # 4. Errorea erdigunetik (-1 eta 1 artean)
     error = (erdigunea - 160) / 160
+    # 5. Kontrol proportzionala (K = 5.0)
     angular_velocity = -5.0 * error
+    # 6. Abiadura lineala (moteldu kurban)
     linear_velocity = 0.3 * (1 - abs(error))
+
+# Abiadura-aginduak argitaratu
 twist_msg.linear.x = min(linear_velocity, 0.3)
 twist_msg.angular.z = np.clip(angular_velocity, -0.5, 0.5)
 \end{lstlisting}
 
-\clearpage
+\needspace{6\baselineskip}
 \section[Abiadurak doitu ingurune errealean ere funtzionatzeko][Ingurune errealeko doikuntzak]{Abiadurak doitu ingurune errealean ere funtzionatzeko}\label{sec:er-doikuntzak}
 
 Simulazioko kodearen (\ref{lst:road-sim}.~kode-zatia) eta pista errealeko azken bertsioaren (\ref{lst:road}.~kode-zatia) artean aldaketa sakonak egin behar izan genituen errealitate fisikora egokitzeko:

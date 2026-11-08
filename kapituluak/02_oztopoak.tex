@@ -40,25 +40,28 @@ Ondoko zatian sektoreen kalkulua eta mugimenduaren hiru kasuak ageri dira. Norae
 \needspace{16\baselineskip}
 \begin{lstlisting}[caption={LiDAR sektoreak, bi segurtasun-atalaseak eta atzerako bultzada \texttt{rwander.py}-n.},label={lst:rwander}]
 m, g30, g90 = self._scan_mid, gradu30, gradu90
-f = sorted(self._scan[m - g30 : m + g30])[4]
-r = sorted(self._scan[m - g90 : m - g30])[4]
-l = sorted(self._scan[m + g30 : m + g90])[4]
-b = sorted(self._scan[0:g30] + self._scan[-g30:])[4]
+# 5. balio txikiena (ez minimoa), irakurketa okerrak kentzeko
+f = sorted(self._scan[m - g30 : m + g30])[4]  # aurrea (+-30 gradu)
+r = sorted(self._scan[m - g90 : m - g30])[4]  # eskuina (30-90 gradu)
+l = sorted(self._scan[m + g30 : m + g90])[4]  # ezkerra (30-90 gradu)
+b = sorted(self._scan[:g30] + self._scan[-g30:])[4]  # atzea (+-30 gradu)
 
+# Aurrea libre: aurrera (2*atalasea arte ez abiatu)
 tarte_segurua = self._avoiding and f < 2 * atalasea
 if f > atalasea and not tarte_segurua:
     self._avoiding = False
-    if r < atalasea:   turn = 0.3
-    elif l < atalasea: turn = -0.3
-    else:              turn = self._deriba
-    speed = 0.3 - 0.1 * abs(turn)
+    if r < atalasea:   turn = 0.3   # eskuineko horma gertu: ezkerrera
+    elif l < atalasea: turn = -0.3  # ezkerreko horma gertu: eskuinera
+    else:              turn = self._deriba  # ausazko noraeza leuna
+    speed = 0.3 - 0.1 * abs(turn)  # biratzean moteldu (0.18-0.3 m/s)
 else:
+    # Oztopoa aurrean: geratu eta bere lekuan biratu
     speed = 0.0
     if not self._avoiding:
         self._avoiding = True
-        self._turn_dir = 1 if l >= r else -1
+        self._turn_dir = 1 if l >= r else -1  # leku gehien duen aldera
     if abs(l - r) <= 0.1 and b > 0.15:
-        speed = -0.15
+        speed = -0.15  # eremu estuan: atzera pixka bat
     turn = 0.8 * self._turn_dir
 \end{lstlisting}
 
