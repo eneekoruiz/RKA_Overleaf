@@ -12,7 +12,7 @@ Bigarrena gertuko eskuin-eremua da (gorriz mugatua), 180--239 errenkadak eta 160
   \caption[Kameraren irudiak eta segmentazioa]{Kameraren benetako irudiak (goian) eta segmentazioa (azpian) hiru unetan: zuzenetan, kurbetan eta kurbaren bukaeran. Laukizuzen berdea aurrerapen-banda da (100--179 errenkadak) eta gorria eskuineko babes-eremua.}\label{fig:kamera-segmentazioa}
 \end{figure}
 
-Ezkerreko irudian errepidea banda berdean ikusten da eta zuzenketa txikia agintzen da. Erdikoan banda beltz dago eta biraketa itsuko kasua aktibatzen da. Eskuinekoan errepidea berriro agertzen da eta medianaren araberako kontrolera itzultzen da.
+Ezkerreko irudian errepidea banda berdean ikusten da eta zuzenketa txikia agintzen da. Erdikoan banda beltza dago eta biraketa itsuko kasua aktibatzen da. Eskuinekoan errepidea berriro agertzen da eta medianaren araberako kontrolera itzultzen da.
 
 \needspace{6\baselineskip}
 \section[Abiaduren kontrola eta kasuen banaketa][Abiaduren kontrola eta kasuak]{Abiaduren kontrola eta kasuen banaketa}\label{sec:er-abiadurak}
@@ -101,7 +101,7 @@ twist_msg.angular.z = np.clip(angular_velocity, -0.5, 0.5)
 \section[Abiadurak doitu ingurune errealean ere funtzionatzeko][Ingurune errealeko doikuntzak]{Abiadurak doitu ingurune errealean ere funtzionatzeko}\label{sec:er-doikuntzak}
 
 Pista errealeko azken bertsioaren (\ref{lst:road}.~kode-zatia) eta simulazioko kodearen (\ref{lst:road-sim}.~kode-zatia) artean aldaketa sakonak egin behar izan genituen errealitate fisikora egokitzeko:
-RKA36 robotarekin, lehenik norabidea nola zuzentzen zuen begiratu genuen. Pista errealean, zoruaren islek eta kameraren bibrazioek errepide gisa hautemandako pixelak aldarazten zituzten. Horregatik, pixel zurien zutabeen mediana erabiltzea erabaki genuen: pixel isolatu batzuek eragin txikiagoa dute erdigunearen kalkuluan. Hasierako probetan robotak zig-zag gehiegi egiten zuenez, $K$ jeitsiz joan ginan $K = 1{,}5$-era iritsi arte, puntua errealitatean aurkitutako oreka sendoena baitzen. Horrela, errore beraren aurrean bira txikiagoa egiten zuen eta mugimendua leunagoa zen.
+RKA36 robotarekin, lehenik norabidea nola zuzentzen zuen begiratu genuen. Pista errealean, zoruaren islek eta kameraren bibrazioek errepide gisa hautemandako pixelak aldarazten zituzten. Horregatik, pixel zurien zutabeen mediana erabiltzea erabaki genuen: pixel isolatu batzuek eragin txikiagoa dute erdigunearen kalkuluan. Hasierako probetan robotak zig-zag gehiegi egiten zuenez, $K$ jaitsiz joan ginen $K = 1{,}5$-era iritsi arte; puntu hori izan zen errealitatean lortutako oreka sendoena. Horrela, errore beraren aurrean bira txikiagoa egiten zuen eta mugimendua leunagoa zen.
 
 Kurbetatik irtetean, robota barruko uhartera gehiegi hurbiltzen zela ikusi genuen. Tarte handiagoa uzteko, erreferentzia 160.~zutabetik 200.era eraman genuen. Errepidea ikusten zuenean, eskuinerako bira ere mugatu genuen ($-0{,}50$~rad/s). Gainera, irudiaren beheko eskuinaldean beltzaren proportzioa \%25etik gorakoa bazen, eskuinerako bira kentzen genion. Horrela, robotak ez zuen barrurantz biratzen jarraitzen. Doikuntza horrekin kanpoko marrara gehiago hurbil daitekeenez, hori ere kontuan hartu genuen.
 
@@ -132,6 +132,6 @@ Lehiaketaren aurreko egunean, RKA36 robotarekin proba-saioa egin genuen bateria 
 \needspace{3\baselineskip}
 \section[Bira bat osatzeko behar den batez besteko denbora neurtu][Bira osatzeko batez besteko denbora]{Bira bat osatzeko behar den batez besteko denbora neurtu}\label{sec:er-denbora}
 
-Bira-denbora kurba baten hasieratik hurrengo biran puntu berera itzuli arte neurtu dugu. Bost saiakeren batez besteko denbora $20{,}82$~s izan da, eta laginaren desbideratze estandarra $0{,}51$~s-koa. Datuetan ikus daitekeenez, lehenengo bira izan zen azkarrena ($20{,}31$~s) eta azkena motelena ($21{,}66$~s). Gure ustez, birak bata bestearen atzetik egitean errorea metatuz joan zen, eta horregatik robotari pixka bat gehiago kostatzen zaio bidea zuzentzea.
+Bira-denbora kurba baten hasieratik hurrengo biran puntu berera itzuli arte neurtu dugu. Bost saiakeren batez besteko denbora $20{,}82$~s izan da, eta laginaren desbideratze estandarra $0{,}51$~s-koa. Datuetan ikus daitekeenez, lehenengo bira izan zen azkarrena ($20{,}31$~s) eta azkena motelena ($21{,}66$~s). Gure ustez, birak bata bestearen atzetik egitean errorea metatuz joan zen, eta horregatik robotari pixka bat gehiago kostatu zitzaion bidea zuzentzea.
 
 Simulazioan, $0{,}30$~m/s-ko gehieneko abiadurarekin, bost biren batez bestekoa 40 segundo ingurukoa izan zen. RKA36rekin gehieneko abiadura $0{,}60$~m/s-ra igo genuen, eta bost biren batez bestekoa $20{,}82$~s izan zen. Pista errealean bira azkarrago osatzeko, zuzenean azkarrago joateaz gain, kurbatik nola ateratzen zen doitu behar izan genuen.
