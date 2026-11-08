@@ -9,7 +9,7 @@ DRIVE_DIR = Path(
     r"G:\Mi unidad\Borrar - Dualismo filosófico - Eneko\Espiritualismo\Estudios\Euskal Herriko Unibertsitatea\Compartido Eneko\4. Kurtsoa\4. Kurtsoa 1. Lauhilekoa\RKA\rka_6\2. Proiektua"
 )
 LOCAL_PDF = Path("overleaf_downloaded.pdf")
-DRIVE_PDF = DRIVE_DIR / "Praktika_Txostena_RKA.pdf"
+DRIVE_PDF = DRIVE_DIR / "txostena_rka.pdf"
 COOKIE_FILE = Path(".olauth")
 
 def main():
