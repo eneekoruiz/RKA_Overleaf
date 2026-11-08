@@ -8,7 +8,7 @@ Bigarrena gertuko eskuin-eremua da (gorriz mugatua), 180--239 errenkadak eta 160
 
 \begin{figure}[H]
   \centering
-  \includegraphics[height=2.8cm,keepaspectratio]{erreala_kamera_eta_segmentazioa.png}
+  \includegraphics[height=4.6cm,keepaspectratio]{erreala_kamera_eta_segmentazioa.png}
   \caption[Kameraren irudiak eta segmentazioa]{Kameraren benetako irudiak (goian) eta segmentazioa (azpian) hiru unetan: zuzenetan, kurbetan eta kurbaren bukaeran. Laukizuzen berdea aurrerapen-banda da (100--179 errenkadak) eta gorria eskuineko babes-eremua.}\label{fig:kamera-segmentazioa}
 \end{figure}
 
@@ -59,7 +59,7 @@ Simulagailurako bertsio garbi bat garatu genuen (\texttt{road\_following.py}, \r
 
 \begin{figure}[H]
   \centering
-  \includegraphics[height=2.2cm,keepaspectratio]{sim_zirkuitua_goitik.png}
+  \includegraphics[height=5.6cm,keepaspectratio]{sim_zirkuitua_goitik.png}
   \caption[Gazeboko yahboom\_track zirkuitua]{Gazeboko \texttt{yahboom\_track} zirkuitua goitik ikusita.}\label{fig:sim-zirkuitua}
 \end{figure}
 
@@ -78,18 +78,18 @@ twist_msg.linear.x = min(linear_velocity, 0.3)
 twist_msg.angular.z = np.clip(angular_velocity, -0.5, 0.5)
 \end{lstlisting}
 
-\needspace{4\baselineskip}
+\clearpage
 \section[Abiadurak doitu ingurune errealean ere funtzionatzeko][Ingurune errealeko doikuntzak]{Abiadurak doitu ingurune errealean ere funtzionatzeko}\label{sec:er-doikuntzak}
 
 Simulazioko kodearen (\ref{lst:road-sim}.~kode-zatia) eta pista errealeko azken bertsioaren (\ref{lst:road}.~kode-zatia) artean aldaketa sakonak egin behar izan genituen errealitate fisikora egokitzeko:
-RKA6 robotarekin, lehenik norabidea nola zuzentzen zuen begiratu genuen. Pista errealean, zoruaren islek eta kameraren bibrazioek errepide gisa hautemandako pixelak aldarazten zituzten. Horregatik, pixel zurien zutabeen mediana erabiltzea erabaki genuen: pixel isolatu batzuek eragin txikiagoa dute erdigunearen kalkuluan. Hasierako probetan robotak alde batera eta bestera gehiegi biratzen zuenez,  = 1{,}5 jaitsi genuen. Horrela, errore beraren aurrean bira txikiagoa egiten zuen eta kulunka murriztu zen.
+RKA6 robotarekin, lehenik norabidea nola zuzentzen zuen begiratu genuen. Pista errealean, zoruaren islek eta kameraren bibrazioek errepide gisa hautemandako pixelak aldarazten zituzten. Horregatik, pixel zurien zutabeen mediana erabiltzea erabaki genuen: pixel isolatu batzuek eragin txikiagoa dute erdigunearen kalkuluan. Hasierako probetan robotak alde batera eta bestera gehiegi biratzen zuenez, $K = 1{,}5$-era jaitsi genuen. Horrela, errore beraren aurrean bira txikiagoa egiten zuen eta kulunka murriztu zen.
 
 kurbatik irtetean, robota barruko uhartera gehiegi hurbiltzen zela ikusi genuen. Tarte handiagoa uzteko, erreferentzia 160.~zutabetik 200.era eraman genuen. Errepidea ikusten zuenean, eskuinerako bira ere mugatu genuen ($-0{,}50$~rad/s). Gainera, irudiaren beheko eskuinaldean beltzaren proportzioa \%25etik gorakoa bazen, eskuinerako bira kentzen genion. Horrela, robotak ez zuen barrurantz biratzen jarraitzen. Doikuntza horrekin kanpoko marrara gehiago hurbil daitekeenez, hori ere kontuan hartu genuen.
 
 Banda berdean errepidea galtzean ere bi robotek desberdin erantzuten zuten. Gazebon nahikoa zen lekuan biratzea. RKA6rekin, berriz, kurbatik hobeto ateratzen zen eskuinera biratu bitartean poliki aurrera eginez ($v = 0{,}20$~m/s eta $\omega = -0{,}80$~rad/s). Maniobra hori noiz hasi erabakitzeko, hasieran 4500 pixeleko atalasea probatu genuen. Zuzen batean 2775 pixel zuri ere neurtu genuenez, atalase horrek kurbatik kanpo ere aktiba zezakeen bira. Horregatik, azken kodean banda berdeko azken pixel zuria desagertzean hasten da maniobra (\texttt{n == 0}).
 
 
-\needspace{4\baselineskip}
+\clearpage
 \section[Egin 5 saiakera zirkuituan bira osoa emateko, eta kalkulatu arrakasta-ehunekoa][5 saiakerak eta arrakasta-tasa]{Egin 5 saiakera zirkuituan bira osoa emateko, eta kalkulatu arrakasta-ehunekoa}\label{sec:er-saiakerak}
 
 Lehiaketaren aurretik, RKA6 robotarekin proba-saioa egin genuen bateria kargatuarekin eta pista librean. Bost saiakeretan zirkuituaren bira osoa osatzea lortu genuen, eta bosgarren saiakeraren eskuzko berrikuspena egin ondoren, arrakasta-tasa $5/5 = \%100$ izan zen (\ref{tab:road-5saiakera}.~taula).

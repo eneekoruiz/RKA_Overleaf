@@ -413,7 +413,7 @@ def parse_figure_block(doc, fig_text: str):
                 p_img.paragraph_format.space_before = Pt(6)
                 p_img.paragraph_format.space_after = Pt(4)
                 p_img.paragraph_format.keep_with_next = True
-                width = Inches(5.2) if ("kamera" in img_name or "abiadurak" in img_name) else Inches(4.5)
+                width = Inches(6.0) if ("kamera" in img_name or "abiadurak" in img_name) else Inches(5.2)
                 p_img.add_run().add_picture(str(img_path), width=width)
 
     if cap_text:
